@@ -42,9 +42,32 @@ EVM
 
 .. ifconfig:: CONFIG_part_family in ('AM64X_family')
 
+   **AM64X_EVM**
+
+   The following diagram depicts USB integration in |__PART_FAMILY_DEVICE_NAMES__| EVM.
+
+   .. image:: /images/usb_am64xx_evm.png
+
+   The following image shows the top view of |__PART_FAMILY_DEVICE_NAMES__| EVM.
+
+   .. image:: /images/am64xx_evm.png
+
    The USB controller operates in USB2.0 dual role mode on |__PART_FAMILY_DEVICE_NAMES__|
    EVM with a microAB receptacle (labeled as J24).
 
    A 2x3 header (labeled as J23) is provided on |__PART_FAMILY_DEVICE_NAMES__|
    EVM to configure the port for host-only mode. Connecting Pin 1 and 2 to enable
    bulk capacitance on VBUS, and connecting Pin 5 and 6 to ground the ID pin.
+
+   **SK-AM64B**
+
+   The following diagram depicts USB integration in SK-AM64B.
+
+   .. image:: /images/usb_am64xx_skevm.png
+
+   On SK-AM64B, USB 3.0 HOST Interface is offered through USB
+   Type-A Connector which supports data rate up-to 5Gbps.
+
+   USB3.0 lines from Type-A connector are connected to the SERDES-0 block of SoC
+   via choke and ESD protection device. USB2.0 Lines of the Type-A Connector are
+   directly interfaced to the USB0 port of AM64x SOC.
