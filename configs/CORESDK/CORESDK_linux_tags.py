@@ -1,18 +1,10 @@
 # Device Family is CORESDK = CORESDK family
 fam_name = 'CORESDK'
 
-# This is coresdk specific information (i.e. not for specific sdk type)
-sdk_product = 'general'
-
 # Processor SDK Linux documentation build configuration file
 
 # The master toctree document.
 master_doc = 'linux/index'
-
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-exclude_patterns = ['rtos', 'android', 'devices']
-
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'ProcessorSDKLinuxdoc'
 
@@ -48,5 +40,3 @@ texinfo_documents = [
    'Miscellaneous'),
 ]
 
-# OS for the build. Sphinx uses source/{sdk_os} when looking for doc inputs
-sdk_os = 'linux'

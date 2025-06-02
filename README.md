@@ -3,19 +3,24 @@ Processor SDK Documentation in Sphinx
 
 ## Instructions to build the project on Ubuntu
 
+### Clone the Git Repo
+
+    $ git clone https://github.com/TexasInstruments/processor-sdk-doc.git
+
 ### Install tools on Ubuntu
 
 Use the following command in a python virtual environment for a known working
 config:
 
-    # python3 -m pip install -r requirements.txt
+    $ cd processor-sdk-doc
+    $ python3 -m pip install -r requirements.txt
+
+> [!WARNING]
+> This is supported using Python v3.12+. If using an older Python version, some package versions in `requirements.txt` may not be compatible, possibly due to an older
+> bundled `pip` version.
 
 OR you can use a docker container like the following:
     - [psdk-doc-docker](https://github.com/TexasInstruments/processor-sdk-doc/pkgs/container/processor-sdk-doc)
-
-### Clone the Git Repo
-
-    $ git clone https://github.com/TexasInstruments/processor-sdk-doc.git
 
 ### Build on Ubuntu
 
@@ -32,6 +37,7 @@ of directories listed under `configs/`. For example:
  * "AM62X" (representing AM62X family)
  * "AM62AX" (representing AM62AX family)
  * "AM62PX" (representing AM62PX family)
+ * "AM62LX" (representing AM62L family)
  * "AM65X" (representing AM65X family)
  * "DRA821A" (representing DRA821A)
  * "J721E" (representing Jacinto 7 ES)
@@ -50,15 +56,15 @@ Example build commands:
 
  - Build linux documentation for AM335X
 
-    $ make DEVFAMILY=AM335X OS=linux
+       $ make DEVFAMILY=AM335X OS=linux
 
  - Build android documentation for AM62X
 
-    $ make DEVFAMILY=AM62X OS=android
+       $ make DEVFAMILY=AM62X OS=android
 
  - Build debian documentation for AM62PX
 
-    $ make DEVFAMILY=AM62PX OS=debian
+       $ make DEVFAMILY=AM62PX OS=debian
 
 ### HTML Page Output
 
@@ -66,7 +72,7 @@ Open the index page in a web browser
 
     linux:   ./build/processor-sdk-linux-<FAMILY>/esd/docs/[version]/index.html
     android: ./build/processor-sdk-android-<FAMILY>/esd/docs/[version]/index.html
-    debian: ./build/processor-sdk-debian-<FAMILY>/esd/docs/[version]/index.html
+    debian:  ./build/processor-sdk-debian-<FAMILY>/esd/docs/[version]/index.html
 
 ## Live Preview on GitHub Pages
 
@@ -78,10 +84,3 @@ You can access the latest bleeding-edge documentation at the following link:
     - [Processor SDK Documentation](https://texasinstruments.github.io/processor-sdk-doc/)
 
 Please treat GitHub Pages as the most up-to-date source of documentation.
-
-## Tips and Tricks
-
-Add the following to your `init.vim` to automatically use the standard
-whitespace values for RST files:
-
-    autocmd FileType rst set tabstop=3 shiftwidth=3 expandtab

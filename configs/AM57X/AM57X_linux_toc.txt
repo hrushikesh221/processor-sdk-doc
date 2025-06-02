@@ -37,7 +37,7 @@ linux/Foundational_Components/U-Boot/UG-SATA
 linux/Foundational_Components/U-Boot/UG-DDR3
 linux/Foundational_Components/U-Boot/UG-RemoteProc
 linux/Foundational_Components/U-Boot/Applications
-linux/Foundational_Components/U-Boot/Apps-SPL-Debug
+linux/Foundational_Components/U-Boot/Apps-SPL-Debug-OpenOCD
 linux/Foundational_Components/U-Boot/Apps-Load-in-CCS
 linux/Foundational_Components/U-Boot/Apps-TroubleShooting
 linux/Foundational_Components_Boot_Monitor
@@ -47,7 +47,7 @@ linux/Foundational_Components/Kernel/Kernel_Drivers/ADC
 linux/Foundational_Components/Kernel/Kernel_Drivers/Audio
 linux/Foundational_Components/Kernel/Kernel_Drivers/Camera/VPFE
 linux/Foundational_Components/Kernel/Kernel_Drivers/Camera/VIP
-linux/Foundational_Components/Kernel/Kernel_Drivers/Crypto
+linux/Foundational_Components/Kernel/Kernel_Drivers/Crypto/SA2UL_OMAP
 linux/Foundational_Components/Kernel/Kernel_Drivers/DCAN
 linux/Foundational_Components/Kernel/Kernel_Drivers/Display/LCDC
 linux/Foundational_Components/Kernel/Kernel_Drivers/GPIO
@@ -98,14 +98,13 @@ linux/Foundational_Components_CMEM
 linux/Foundational_Components_OPTEE
 linux/Foundational_Components_ATF
 
-linux/Foundational_Components_Graphics
+linux/Foundational_Components/Graphics/index
 linux/Foundational_Components/Graphics/Common/Display
 linux/Foundational_Components/Graphics/Common/GTK+_Graphics_Framework
 linux/Foundational_Components/Graphics/Common/OpenGL_ES
 linux/Foundational_Components/Graphics/Common/PVR_Tools
 linux/Foundational_Components/Graphics/Common/QT_Graphics_Framework
 linux/Foundational_Components/Graphics/Common/Weston
-linux/Foundational_Components/Graphics/SGX/Migration_From_Prior_Releases
 linux/Foundational_Components/Graphics/SGX/OMAP_DRM
 linux/Foundational_Components/Graphics/SGX/Overview
 linux/Foundational_Components/Graphics/SGX/SGX_Debug_Info

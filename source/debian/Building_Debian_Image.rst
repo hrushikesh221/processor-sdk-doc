@@ -19,7 +19,7 @@ There are several opensource tools available for generating the RootFS in a chro
 
 In other words, ``ti-bdebstrap`` offers users an easy way to create a full-fledged Debian image for supported TI platforms, using a single command. Once the image is built, the user can directly flash it onto a SD card.
 
-TI currently supports building Debian Bookworm Images for AM62Px, AM62x and AM64x platforms.
+TI currently supports building Debian images for AM62Lx, AM62Px, AM62x and AM64x platforms.
 
 Usage
 =====
@@ -31,7 +31,7 @@ The scripts are hosted at https://github.com/TexasInstruments/ti-bdebstrap
 
 To clone the repository, run:
 
-.. code-block::
+.. code-block:: console
 
     git clone https://github.com/TexasInstruments/ti-bdebstrap.git
 
@@ -39,32 +39,32 @@ To clone the repository, run:
 Repository Structure
 --------------------
 
-.. code-block::
+.. code-block:: text
 
-    ti-bdebstrap
+    tibdebstrap/
     ├── build.sh
     ├── builds.toml
     ├── configs
-    │   ├── bdebstrap_configs
-    │   │   ├── bookworm
-    │   │   │   ├── bookworm-<machine>.yaml
-    │   │   │   └── bookworm-rt-<machine>.yaml
-    │   │   └── trixie
-    │   │       ├── trixie-<machine>.yaml
-    │   │       └── trixie-rt-<machine>.yaml
-    │   ├── bsp_sources.toml
-    │   └── machines --> Machine configurations for each BSP version
-    │       ├── 09.02.00.010.toml
-    │       └── 10.01.10.04.toml
+    │   ├── bdebstrap_configs
+    │   │   ├── bookworm
+    │   │   │   ├── bookworm-<machine>.yaml
+    │   │   │   └── bookworm-rt-<machine>.yaml
+    │   │   └── trixie
+    │   │       ├── trixie-<machine>.yaml
+    │   │       └── trixie-rt-<machine>.yaml
+    │   ├── bsp_sources.toml
+    │   └── machines
+    │       ├── 09.02.00.010.toml
+    │       └── 11.00.05.02.toml
     ├── create-sdcard.sh
     ├── create-wic.sh
     ├── LICENSE
     ├── README.md
     ├── scripts
-    │   ├── build_bsp.sh
-    │   ├── build_distro.sh
-    │   ├── common.sh
-    │   └── setup.sh
+    │   ├── build_bsp.sh
+    │   ├── build_distro.sh
+    │   ├── common.sh
+    │   └── setup.sh
     └── target --> Custom files to deploy in target.
 
 ``build.sh``: the "main" script that the user should run to generate Debian images.
@@ -108,13 +108,13 @@ Install Pre-requisite Packages
 
 First, ensure that your repositories are up-to-date:
 
-.. code-block::
+.. code-block:: console
 
     sudo apt update
 
 Then, install packages as follows:
 
-.. code-block::
+.. code-block:: console
 
     sudo apt install -y \
         pigz expect pv \
@@ -128,13 +128,13 @@ Then, install packages as follows:
 
 Ensure that all packages were correctly installed using:
 
-.. code-block::
+.. code-block:: console
 
     sudo apt install --fix-broken
 
 Finally, install ``toml-cli`` and ``yamllint``:
 
-.. code-block::
+.. code-block:: console
 
     pip3 install toml-cli
     pip3 install yamllint
@@ -182,7 +182,7 @@ Building the Image
 
 To build an image, you need to run the :file:`build.sh` script:
 
-.. code-block::
+.. code-block:: console
 
     sudo ./build.sh <build-name>
 
@@ -192,7 +192,7 @@ After the build, the RootFS, Boot partition and bsp_sources are stored in :file:
 
 Example: to build for ``trixie-am62pxx-evm``, run:
 
-.. code-block::
+.. code-block:: console
 
     sudo ./build.sh trixie-am62pxx-evm
 
@@ -205,13 +205,13 @@ This step can be skipped if you do not want to share the generated Image with an
 
 To generate an SD Card Image with the generated RootFS and Boot partition files, run:
 
-.. code-block::
+.. code-block:: console
 
    ./create-wic.sh <build-name>
 
 Example: to build for ``trixie-am62pxx-evm``, run:
 
-.. code-block::
+.. code-block:: console
 
    ./create-wic.sh trixie-am62pxx-evm
 
@@ -222,13 +222,13 @@ Flash Image to SD Card using Script
 
 To flash the SD card without generating a wic image, use the :file:`create-sdcard.sh` script. Run it using the below command and follow with the prompts.
 
-.. code-block::
+.. code-block:: console
 
     sudo ./create-sdcard.sh <build-name>
 
 For example, if the image is ``trixie-am62pxx-evm``, type:
 
-.. code-block::
+.. code-block:: console
 
     sudo ./create-sdcard.sh trixie-am62pxx-evm
 

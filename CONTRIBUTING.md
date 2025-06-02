@@ -110,6 +110,50 @@ directive](https://www.sphinx-doc.org/en/master/usage/extensions/ifconfig.html).
 Not all parsers will respect this directive, so be sure to try compiling the
 documentation for a platform that matches the ifconfig prior to submitting a PR.
 
+#### Behavior
+
+You cannot use the ifconfig directive to avoid parsing other directives,
+sections, or other RST components. The ifconfig directive acts as a standard RST
+directive where content under it is conditionally masked in the final document
+output.
+
+Sphinx functionally has 2 main processing steps. The first path takes care of
+substitutions, role and directive definitions, sections, and references. The
+second pass actually processes the directives and other RST structures. Because
+of this, RST underneath an ifconfig will be evaluated whether or not it visible
+in the final document output.
+
+In some cases, this can change the behavior of external components if they are
+handled by the first processing step. For example, given the following snippet:
+
+```rst
+.. ifconfig:: CONFIG_part_variant in ('J721S2')
+
+   Content
+
+   .. |REPLACE_A| replace:: replace_b
+
+|REPLACE_A|
+```
+
+When `CONFIG_part_variant` is `J721S2` you may correctly expect the following to
+be rendered:
+
+```
+Content
+replace_b
+```
+
+The disconnect comes in when `CONFIG_part_variant` is `J784S4`. The replacement
+will still be defined and included into the main state machine that handles
+refs, replacements, and other key directives regardless of whether the content
+is displayed in the final document output. The following is the output generated
+in this case:
+
+```
+replace_b
+```
+
 ## Licensing
 
 ### Community
@@ -135,6 +179,22 @@ Copyright (C) 2024 Texas Instruments Incorporated - https://www.ti.com
 
 All other files inherit the generic CC-BY-SA-4.0 license and do not require an
 explicit license / copyright notice.
+
+## Vale grammar, spelling and prose checking
+
+This project currently uses [Vale](https://vale.sh/) for grammar spelling and
+prose checking. We operate on a loose version of [Red Hat's documentation style
+guidelines](https://github.com/redhat-documentation/vale-at-red-hat).
+
+If there are words it detects as misspellings, add those words to the custom
+vocabulary entry in
+[accept.txt](.github/styles/config/vocabularies/PSDK/accept.txt). If there are
+words you see that you think do not constitute usage here, add those words to
+the [reject.txt](.github/styles/config/vocabularies/PSDK/reject.txt). Ensure the
+contents of these files are alphabetically sorted after any modifications.
+
+Information about the formatting of these files is available
+[upstream](https://vale.sh/docs/keys/vocab#file-format).
 
 ## Fighting workflows
 

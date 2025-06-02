@@ -1,15 +1,10 @@
 # Device Family is GEN = General family
 fam_name = 'GEN'
-# SDK is general (i.e. not automotive)
-sdk_product = 'general'
+
 # Processor SDK Android documentation build configuration file
 
 # The master toctree document.
 master_doc = 'android/index'
-
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-exclude_patterns = ['rtos', 'linux', 'devices']
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'ProcessorSDKAndroiddoc'
@@ -45,6 +40,3 @@ texinfo_documents = [
    'Texas Instruments Incorporated', 'ProcessorSDKAndroid', 'One line description of project.',
    'Miscellaneous'),
 ]
-
-# OS for the build. Sphinx uses source/{sdk_os} when looking for doc inputs
-sdk_os = 'android'

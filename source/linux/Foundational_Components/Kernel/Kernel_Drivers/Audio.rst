@@ -785,10 +785,55 @@ Board-specific instructions
         amixer sset 'Right PGA Mixer Mic3R' on
         amixer sset PGA 90%
 
-    To switch to using HDMI for playback you can refer to the `How to playback
-    audio over HDMI
-    <../../../How_to_Guides/Target/How_to_playback_audio_over_HDMI.html>`__
-    guide.
+    To switch to using HDMI for playback you can refer to: :ref:`hdmi-audio`.
+
+.. ifconfig:: CONFIG_part_variant in ('AM62LX')
+
+    .. rubric:: SK-AM62L
+       :name: sk-am62l
+
+    | The board uses **tlv320aic3106 codec** connected through **McASP0
+      [AXR0 for playback, AXR1 for Capture]** for audio. The board features
+      one TRRS 3.5mm jack, that can be used for simultaneous stereo playback
+      and mono recording. Same McASP0 lines are also muxed to the **sii9022
+      HDMI bridge**.
+
+    .. rubric:: Kernel config
+       :name: kernel-config-9
+
+    .. code-block:: text
+
+        Device Drivers  --->
+          Sound card support  --->
+            Advanced Linux Sound Architecture  --->
+              ALSA for SoC audio support  --->
+                Audio support for Texas Instruments SoCs  --->
+                  <*> Multichannel Audio Serial Port (McASP) support
+                CODEC drivers  --->
+                  <*> Texas Instruments TLV320AIC3x CODECs
+                <*>   ASoC Simple sound card support
+
+    .. rubric:: User space
+       :name: user-space-9
+
+.. _hdmi_audio:
+    The hardware defaults are correct for audio playback, the routing is OK
+    and the volume is 'adequate' but in case the volume is not correct:
+
+    .. code-block:: text
+
+        amixer sset PCM 90%
+
+    For recording using the mic pin on the 3.5mm jack, you will need to unmute
+    MIC3R on the codec, and increase the capture volume:
+
+    .. code-block:: text
+
+        amixer sset 'Left PGA Mixer Mic3R' on
+        amixer sset 'Right PGA Mixer Mic3R' on
+        amixer sset PGA 90%
+
+    To switch to using HDMI for playback you can refer to: :ref:`hdmi-audio`.
 
 Potential issues
 ^^^^^^^^^^^^^^^^
@@ -808,35 +853,6 @@ Potential issues
 -  Try to cache the file to be played in memory
 -  Try to use application which uses threads for interacting with ALSA
    and with the filesystem
-
-.. rubric:: In case of CPU stalls (when recording)
-   :name: in-case-of-cpu-stalls-when-recording
-
-| **No longer relevant** as DMA driver does a force teardown of the channel.
-| On some platforms, recording audio on high sample rates may work fine the
-  first time, but due to issues with channel cleanup it may cause CPU stalls
-  when recording the second time, requiring a reboot to fix.
-| In such scenarios, use smaller period sizes (64 to 256) while recording. For
-  example:
-
-.. code-block:: text
-
-    arecord -Dplughw:0,0 -r 48000 -t wav --period-size=64 <path to wav file>
-
-.. rubric:: ALSA period size must be aligned with the FIFO depth (tx/rx
-   numevt)
-   :name: alsa-period-size-must-be-aligned-with-the-fifo-depth-txrx-numevt
-
-| **No longer relevant** as the kernel side takes care of the AFIFO
-  depth vs period size issue.
-| To decrease audio-caused stress on the system, the AFIFO is enabled and
-  the depth is set to 32 for McASP.
-| If the ALSA period size is not aligned with this FIFO setting, a constant
-  'trrrrr' can be heard on the output. This is caused by the eDMA not being able
-  to handle a fragment size that is not aligned with burst size (AFIFO depth).
-| Application needs to make sure that **period\_size / FIFO depth** is
-  even number.
-|
 
 Additional Information
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -864,7 +880,7 @@ Additional Information
     #. `Interfacing DRA7xx Audio to Analog Codecs
        <http://www.ti.com/lit/an/sprac09a/sprac09a.pdf>`__
 
-.. ifconfig:: CONFIG_part_family in ('J7_family', 'AM62X_family', 'AM62AX_family', 'AM62PX_family')
+.. ifconfig:: CONFIG_part_family in ('J7_family', 'AM62X_family', 'AM62AX_family', 'AM62PX_family', 'AM62LX_family')
 
     #. `Tools and Techniques for Audio Debugging
        <https://www.ti.com/lit/an/sprac10/sprac10.pdf>`__
@@ -872,7 +888,7 @@ Additional Information
 .. rubric:: Audio hardware codecs
    :name: additional-information-audio-hardware-codecs
 
-.. ifconfig:: CONFIG_part_variant in ('Gen', 'AM335X', 'AM437X', 'AM62X', 'AM62AX', 'AM62PX', 'J722S')
+.. ifconfig:: CONFIG_part_variant in ('Gen', 'AM335X', 'AM437X', 'AM62X', 'AM62AX', 'AM62PX', 'J722S', 'AM62LX')
 
     #. `TLV320AIC31 - Low-Power Stereo CODEC with HP
        Amplifier <http://www.ti.com/lit/ds/symlink/tlv320aic31.pdf>`__

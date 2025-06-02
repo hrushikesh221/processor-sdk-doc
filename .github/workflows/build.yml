@@ -28,6 +28,7 @@ jobs:
           - AM437X
           - AM57X
           - AM62AX
+          - AM62LX
           - AM62PX
           - AM62X
           - AM64X
@@ -50,12 +51,16 @@ jobs:
             device: AM62X
           - os: buildroot
             device: AM62X
+          - os: buildroot
+            device: AM62LX
           - os: debian
             device: AM62X
           - os: debian
             device: AM62PX
           - os: debian
             device: AM64X
+          - os: debian
+            device: AM62LX
 
     steps:
       - name: Checkout

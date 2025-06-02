@@ -27,6 +27,7 @@ Yocto Layer Configuration
       ./oe-layertool-setup.sh -f configs/processor-sdk-linux/<Config File>
 
 The Linux SDK package also has the above tool cloned at the top level. If you have it installed:
+
 ::
 
     cd <SDK INSTALL DIR>/yocto-build
@@ -39,7 +40,7 @@ Use below in place of <Config File>, to setup the meta layers for the current re
    +----------------------------------------------------+-------------------------------------+--------------------------------+
    |                    Description                     |      Config File                    | Supported yocto build machine  |
    +====================================================+=====================================+================================+
-   | |__SDK_FULL_NAME__| : 10_01 Release                | processor-sdk-linux-10_01_08_01.txt | |__SDK_BUILD_MACHINE__|        |
+   | |__SDK_FULL_NAME__| : 11_00 Release                | processor-sdk-linux-11_00_10_01.txt | |__SDK_BUILD_MACHINE__|        |
    +----------------------------------------------------+-------------------------------------+--------------------------------+
 
 .. ifconfig:: CONFIG_image_type in ('edgeai', 'adas')
@@ -47,5 +48,5 @@ Use below in place of <Config File>, to setup the meta layers for the current re
    +----------------------------------------------------+------------------------------------------------+--------------------------------+
    |                    Description                     |      Config File                               | Supported yocto build machine  |
    +====================================================+================================================+================================+
-   | |__SDK_FULL_NAME__| : 10_01_00 Release             | processor-sdk-analytics-10.01.00-config.txt    | |__SDK_BUILD_MACHINE__|        |
+   | |__SDK_FULL_NAME__| : 11_00_00 Release             | processor-sdk-analytics-11.00.00-config.txt    | |__SDK_BUILD_MACHINE__|        |
    +----------------------------------------------------+------------------------------------------------+--------------------------------+

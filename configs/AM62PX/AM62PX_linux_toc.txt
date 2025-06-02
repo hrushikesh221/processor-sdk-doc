@@ -1,6 +1,5 @@
 devices/AM62PX/index
 devices/AM62PX/index_RTOS
-devices/AM62PX/index_Applications
 devices/AM62PX/linux/Overview
 devices/AM62PX/linux/Overview_Getting_Started_Guide
 devices/AM62PX/linux/Overview/Download_and_Install_the_SDK
@@ -39,7 +38,6 @@ linux/Foundational_Components/U-Boot/UG-Splash-Screen
 linux/Foundational_Components/U-Boot/UG-RemoteProc
 
 linux/Foundational_Components/U-Boot/Applications
-linux/Foundational_Components/U-Boot/Apps-SPL-Debug
 linux/Foundational_Components/U-Boot/Apps-SPL-Debug-OpenOCD
 #linux/Foundational_Components/U-Boot/Apps-Load-in-CCS
 #linux/Foundational_Components/U-Boot/Apps-TroubleShooting
@@ -49,7 +47,7 @@ linux/Foundational_Components_Kernel_Drivers
 #linux/Foundational_Components/Kernel/Kernel_Drivers/ADC
 linux/Foundational_Components/Kernel/Kernel_Drivers/Audio
 linux/Foundational_Components/Kernel/Kernel_Drivers/Camera/CSI2RX
-linux/Foundational_Components/Kernel/Kernel_Drivers/Crypto
+linux/Foundational_Components/Kernel/Kernel_Drivers/Crypto/SA2UL_OMAP
 linux/Foundational_Components/Kernel/Kernel_Drivers/Display/DSS7
 linux/Foundational_Components/Kernel/Kernel_Drivers/DM-Timer
 linux/Foundational_Components/Kernel/Kernel_Drivers/EQEP
@@ -91,6 +89,7 @@ linux/Foundational_Components/Power_Management/pm_sw_arch
 linux/Foundational_Components/Power_Management/pm_debug
 
 linux/Foundational_Components/System_Security/SELinux
+linux/Foundational_Components/System_Security/Auth_boot
 
 linux/Foundational_Components_Kernel_Users_Guide
 linux/Foundational_Components_Kernel_LTP-DDT_Validation
@@ -107,6 +106,11 @@ linux/Foundational_Components/Tools/Flash_via_UART
 linux/Foundational_Components/Tools/GPIO_Tools
 linux/Foundational_Components_IPC62px
 linux/Foundational_Components_Machine_Learning
+linux/Foundational_Components/Machine_Learning/arm_compute_library
+linux/Foundational_Components/Machine_Learning/armnn
+linux/Foundational_Components/Machine_Learning/nnstreamer
+linux/Foundational_Components/Machine_Learning/onnxrt
+linux/Foundational_Components/Machine_Learning/tflite
 linux/Foundational_Components_OPTEE
 linux/Foundational_Components_ATF
 linux/Foundational_Components_Multimedia_wave5
@@ -115,7 +119,7 @@ linux/Foundational_Components/Virtualization/Docker
 linux/Foundational_Components_Hypervisor
 linux/Foundational_Components/Hypervisor/Jailhouse
 
-linux/Foundational_Components_Graphics
+linux/Foundational_Components/Graphics/index
 linux/Foundational_Components/Graphics/Common/Display
 linux/Foundational_Components/Graphics/Common/GTK+_Graphics_Framework
 linux/Foundational_Components/Graphics/Common/OpenGL_ES
@@ -123,6 +127,7 @@ linux/Foundational_Components/Graphics/Common/PVR_Tools
 linux/Foundational_Components/Graphics/Common/QT_Graphics_Framework
 linux/Foundational_Components/Graphics/Common/Vulkan
 linux/Foundational_Components/Graphics/Common/Weston
+linux/Foundational_Components/Graphics/Common/OpenCL
 linux/Foundational_Components/Graphics/Rogue/Overview
 linux/Foundational_Components/Graphics/Rogue/Rogue_Debug_Info
 linux/Foundational_Components/Graphics/Rogue/Rogue_Power_Management_Info
@@ -138,7 +143,8 @@ linux/How_to_Guides/Host/How_to_Setup_and_Debug_using_Lauterbach
 linux/How_to_Guides/Host/SYSFW_Trace_Parser
 #linux/How_to_Guides/Host/Minimal_Platform_Development
 linux/How_to_Guides/Target/Processor_SDK_Linux_File_System_Optimization_Customization
-#linux/How_to_Guides/Target/How_to_manually_flash_emmc_device   # We do not support this for now
+linux/How_to_Guides/Target/How_to_emmc_boot
+linux/How_to_Guides/Target/How_to_mmcsd_boot_emmc_uda
 #linux/How_to_Guides/Target/How_to_suspend_to_ram_on_AM62x
 linux/How_to_Guides/Target/How_to_test_MCAN_on_AM62x
 linux/How_to_Guides/Target/How_to_enable_DT_overlays_in_linux
@@ -154,10 +160,12 @@ linux/How_to_Guides/FAQ/How_to_Check_Device_Tree_Info
 linux/How_to_Guides/FAQ/How_to_Integrate_Open_Source_Software
 linux/How_to_Guides_Hardware_Setup_with_CCS
 linux/How_to_Guides/Hardware_Setup_with_CCS/AM62Px_EVM_Hardware_Setup
+linux/How_to_Guides/Target/How_To_Carve_Out_CMA
 
-system/Demo_User_Guides/TI_Apps_Launcher_User_Guide
-system/Demo_User_Guides/Seva_Store
-system/Demo_User_Guides/Display_Cluster_User_Guide
-system/Demo_User_Guides/Chromium_Browser
+linux/Demo_User_Guides/index_Demos
+linux/Demo_User_Guides/TI_Apps_Launcher_User_Guide
+linux/Demo_User_Guides/Seva_Store
+linux/Demo_User_Guides/Display_Cluster_User_Guide
+linux/Demo_User_Guides/Chromium_Browser
 
 linux/Documentation_Tarball

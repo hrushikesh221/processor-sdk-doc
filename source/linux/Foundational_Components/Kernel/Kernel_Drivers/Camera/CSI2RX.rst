@@ -111,6 +111,14 @@ below set of commands can achieve this:
 
    media-ctl --print-dot | dot -Tpng > graph.png
 
+To check for errors during streaming, locate the subdevice for the Cadence CSI2RX in the media pipeline and run the following command:
+
+.. code-block:: console
+
+   v4l2-ctl --log-status -d /dev/v4l-subdevX
+
+Replace /dev/v4l-subdevX with the correct subdevice node of the Cadence CSI2RX receiver. After running the above command, you will be able to see information regarding any errors during streaming such as short packets or ECC errors in the kernel logs.
+
 Building the driver
 ===================
 
@@ -361,7 +369,7 @@ Enabling camera sensors
       $ gst-launch-1.0 v4l2src device="/dev/video0" ! video/x-raw, width=640, height=480, format=UYVY ! autovideosink
 
       # Direct KMS Sink
-      $ systemctl stop weston
+      $ systemctl stop emptty
       $ gst-launch-1.0 v4l2src device="/dev/video0" ! video/x-raw, width=640, height=480, format=UYVY ! queue ! kmssink driver-name=tidss plane-properties=s,zpos=1
 
    You can also replace v4l2src with libcamerasrc above if you want to test
@@ -370,6 +378,29 @@ Enabling camera sensors
    .. code-block:: console
 
       $ gst-launch-1.0 libcamerasrc ! video/x-raw, width=1024, height=768, format=UYVY ! autovideosink
+
+   .. ifconfig:: CONFIG_part_variant in ('AM62PX')
+
+      You can also run mosaic camera to display stream from 4 OV5640 connected to the SK-AM62P using V3Link fusion mini board.
+
+      .. note::
+
+         Arm neon accelerated TI elements for video mosaicing and color format conversion namely ``timosaic`` and ``ticolorconvert`` are not present in AM62P SDK 11.00.
+         To run the below pipeline, AM62P SDK 10.01 should be used with the SDK 11.00 kernel installed from `here <https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/log/?h=ti-linux-6.12.y>`__.
+
+      .. code-block:: console
+
+         $ gst-launch-1.0 \
+         v4l2src device=/dev/video-ov5640-cam0 ! video/x-raw, width=640,height=480, format=YUY2 ! ticolorconvert ! queue ! mosaic.sink_0 \
+         v4l2src device=/dev/video-ov5640-cam1 ! video/x-raw, width=640,height=480, format=YUY2 ! ticolorconvert ! queue ! mosaic.sink_1 \
+         v4l2src device=/dev/video-ov5640-cam2 ! video/x-raw, width=640,height=480, format=YUY2 ! ticolorconvert ! queue ! mosaic.sink_2 \
+         v4l2src device=/dev/video-ov5640-cam3 ! video/x-raw, width=640,height=480, format=YUY2 ! ticolorconvert ! queue ! mosaic.sink_3 \
+         timosaic name=mosaic \
+         sink_0::startx=300 sink_0::starty=0 sink_0::width=640 sink_0::height=480 \
+         sink_1::startx=980 sink_1::starty=0 sink_1::width=640 sink_1::height=480  \
+         sink_2::startx=300 sink_2::starty=500 sink_2::width=640 sink_2::height=480 \
+         sink_3::startx=980 sink_3::starty=500 sink_3::width=640 sink_3::height=480 ! \
+         video/x-raw, width=1920, height=1080, format=NV12 ! queue ! kmssink driver-name=tidss sync=false force-modesetting=true
 
    Suspend to RAM
    ==============
@@ -390,72 +421,8 @@ Enabling camera sensors
 
    .. attention::
 
-      Only TEVI OV5640 module is known to work reliably when system is
-      suspended with capture running. And that too, with the below patch
-      applied to prevent races between different camera pipeline devices on
-      system resume. This is due to V4L2 framework's async notifier
-      limitations, which currently does not support sending notifications
-      between subdevice drivers on wakeup from suspend state.
+      Only TEVI OV5640 and IMX219 are known to work reliably when system is suspended with capture running.
 
-
-   The Technexion TEVI-OV5640 module supports this, but it may fail to set the
-   sensor registers in time when built as a module. You can fix this by making
-   it a part of the kernel image:
-
-   .. code-block:: diff
-
-      diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-      index bb3cd088db44..2262f23cd9ab 100644
-      --- a/arch/arm64/configs/defconfig
-      +++ b/arch/arm64/configs/defconfig
-      @@ -805,7 +805,7 @@ CONFIG_RC_DEVICES=y
-       CONFIG_IR_GPIO_CIR=m
-       CONFIG_IR_MESON=m
-       CONFIG_IR_SUNXI=m
-      -CONFIG_MEDIA_SUPPORT=m
-      +CONFIG_MEDIA_SUPPORT=y
-       CONFIG_MEDIA_CAMERA_SUPPORT=y
-       CONFIG_MEDIA_ANALOG_TV_SUPPORT=y
-       CONFIG_MEDIA_DIGITAL_TV_SUPPORT=y
-      @@ -817,7 +817,7 @@ CONFIG_USB_VIDEO_CLASS=m
-       CONFIG_V4L_PLATFORM_DRIVERS=y
-       CONFIG_SDR_PLATFORM_DRIVERS=y
-       CONFIG_V4L_MEM2MEM_DRIVERS=y
-      -CONFIG_VIDEO_CADENCE_CSI2RX=m
-      +CONFIG_VIDEO_CADENCE_CSI2RX=y
-       CONFIG_VIDEO_WAVE_VPU=m
-       CONFIG_VIDEO_IMG_VXE_ENC=m
-       CONFIG_VIDEO_E5010_JPEG_ENC=m
-      @@ -842,13 +842,13 @@ CONFIG_VIDEO_SAMSUNG_EXYNOS_GSC=m
-       CONFIG_VIDEO_SAMSUNG_S5P_JPEG=m
-       CONFIG_VIDEO_SAMSUNG_S5P_MFC=m
-       CONFIG_VIDEO_SUN6I_CSI=m
-      -CONFIG_VIDEO_TI_J721E_CSI2RX=m
-      +CONFIG_VIDEO_TI_J721E_CSI2RX=y
-       CONFIG_VIDEO_HANTRO=m
-       CONFIG_VIDEO_IMX219=m
-       CONFIG_VIDEO_IMX390=m
-       CONFIG_VIDEO_IMX412=m
-       CONFIG_VIDEO_OV2312=m
-      -CONFIG_VIDEO_OV5640=m
-      +CONFIG_VIDEO_OV5640=y
-       CONFIG_VIDEO_OV5645=m
-       CONFIG_VIDEO_OX05B1S=m
-       CONFIG_VIDEO_DS90UB953=m
-      @@ -1459,8 +1459,8 @@ CONFIG_PHY_XGENE=y
-       CONFIG_PHY_CAN_TRANSCEIVER=m
-       CONFIG_PHY_SUN4I_USB=y
-       CONFIG_PHY_CADENCE_TORRENT=y
-      -CONFIG_PHY_CADENCE_DPHY=m
-      -CONFIG_PHY_CADENCE_DPHY_RX=m
-      +CONFIG_PHY_CADENCE_DPHY=y
-       +CONFIG_PHY_CADENCE_DPHY_RX=y
-       CONFIG_PHY_CADENCE_SIERRA=y
-       CONFIG_PHY_MIXEL_MIPI_DPHY=m
-       CONFIG_PHY_FSL_IMX8M_PCIE=y
-
-   To re-build the kernel with above changes you can refer to the
-   :ref:`Users Guide <users-guide-kernel-config>`.
 
 .. ifconfig:: CONFIG_part_variant in ('AM62X')
 
@@ -682,12 +649,11 @@ Enabling camera sensors
    auto-exposure/auto-white-balance algorithms and other pre-processing
    blocks.
 
-   You may have to stop the display server (weston) before running the below
-   pipelines:
+   You may have to stop the display manager before running the below pipelines:
 
    .. code-block:: console
 
-      $ systemctl stop weston.service
+      $ systemctl stop emptty
 
    Use the following pipeline for IMX219 1920x1080 RAW8 mode:
 
@@ -770,6 +736,10 @@ Enabling camera sensors
       => setenv name_overlays ti/k3-j721e-evm-fusion.dtbo ti/k3-fpdlink-imx390-rcm-0-0.dtbo
       => boot
 
+      # For single RCM IMX390 connected to RX port 0 on DS90UB954-Q1 EVM on J721E EVM:
+      => setenv name_overlays ti/k3-j721e-evm-ub954.dtbo ti/k3-fpdlink-imx390-rcm-0-0.dtbo
+      => boot
+
       # For single RCM IMX390 connected to RX port 0 on Fusion board EVM on J721E SK:222
       => setenv name_overlays ti/k3-j721e-sk-fpdlink-fusion.dtbo  ti/k3-fpdlink-imx390-rcm-0-0.dtbo
       => boot
@@ -798,6 +768,8 @@ Enabling camera sensors
        | J721E EVM    | LI OV5640 MIPI CSI Camera             | YUYV8_1X16/1280x720 at 30 fps     |
        +--------------+---------------------------------------+-----------------------------------+
        | J721E EVM    | FPDLink fusion 1 EVM, IMX390          | SRGGB12_1X12/1936x1100 at 30 fps  |
+       +--------------+---------------------------------------+-----------------------------------+
+       | J721E EVM    | DS90UB954-Q1 EVM, IMX390              | SRGGB12_1X12/1936x1100 at 30 fps  |
        +--------------+---------------------------------------+-----------------------------------+
        | J721E SK     | IMX219 RPi Camera                     | SRGGB8_1X8/1920x1080 at 30 fps    |
        +--------------+---------------------------------------+-----------------------------------+
@@ -831,8 +803,16 @@ Enabling camera sensors
       => setenv name_overlays ti/k3-j721s2-evm-fusion.dtbo ti/k3-fpdlink-imx390-rcm-0-0.dtbo
       => boot
 
+      # For single RCM IMX390 connected to RX port 0 on DS90UB954-Q1 EVM on J721S2 EVM:
+      => setenv name_overlays ti/k3-j721s2-evm-ub954.dtbo ti/k3-fpdlink-imx390-rcm-0-0.dtbo
+      => boot
+
       # For single RCM IMX390 connected to RX port 0 on Fusion board EVM on AM68A SK:
       => setenv name_overlays ti/k3-j721e-sk-fpdlink-fusion.dtbo ti/k3-fpdlink-imx390-rcm-0-0.dtbo
+      => boot
+
+      # For single IMX219 connected to RX port 0 on V3Link fusion on AM68A SK:
+      => setenv name_overlays ti/k3-am68-sk-v3link-fusion.dtbo ti/k3-v3link-imx219-0-0.dtbo
       => boot
 
    To enable IMX219 camera connected to the 22-pin FFC connectoron AM68A SK,
@@ -860,11 +840,15 @@ Enabling camera sensors
       +--------------+---------------------------------------+-----------------------------------+
       | J721S2       | FPDLink fusion 1 EVM, IMX390          | SRGGB12_1X12/1936x1100 at 30 fps  |
       +--------------+---------------------------------------+-----------------------------------+
+      | J721S2       | DS90UB954-Q1 EVM, IMX390              | SRGGB12_1X12/1936x1100 at 30 fps  |
+      +--------------+---------------------------------------+-----------------------------------+
       | AM68A        | IMX219 RPi Camera                     | SRGGB8_1X8/1920x1080 at 30 fps    |
       +--------------+---------------------------------------+-----------------------------------+
       | AM68A        | LI OV5640 MIPI CSI Camera             | YUYV8_1X16/1280x720 at 30 fps     |
       +--------------+---------------------------------------+-----------------------------------+
       | AM68A        | FPDLink fusion 1 EVM, IMX390          | SRGGB12_1X12/1936x1100 at 30 fps  |
+      +--------------+---------------------------------------+-----------------------------------+
+      | AM68A        | V3Link fusion, IMX219                 | SRGGB8_1X8/1920x1080 at 30 fps    |
       +--------------+---------------------------------------+-----------------------------------+
 
 .. ifconfig:: CONFIG_part_variant in ('J784S4','J742S2')
@@ -889,9 +873,33 @@ Enabling camera sensors
       => setenv name_overlays ti/k3-j721s2-evm-fusion.dtbo ti/k3-fpdlink-imx390-rcm-0-0.dtbo
       => boot
 
+      # For single RCM IMX390 connected to port 0 on FPDLink IV Fusion 2 board on J784S4/J742S2 EVM:
+      => setenv name_overlays ti/k3-j784s4-evm-fpdlink-iv-fusion.dtbo ti/k3-fpdlink-imx390-rcm-0-0.dtbo
+      => boot
+
+      # For single RCM IMX390 connected to RX port 0 on DS90UB954-Q1 EVM on J784S4 EVM:
+      => setenv name_overlays ti/k3-j721s2-evm-ub954.dtbo ti/k3-fpdlink-imx390-rcm-0-0.dtbo
+      => boot
+
       # For single RCM IMX390 connected to RX port 0 on Fusion board EVM on AM69A SK:
       => setenv name_overlays ti/k3-j721e-sk-fpdlink-fusion.dtbo ti/k3-fpdlink-imx390-rcm-0-0.dtbo
       => boot
+
+      # For single IMX219 connected to RX port 0 on V3Link fusion on AM69A SK:
+      => setenv name_overlays ti/k3-am68-sk-v3link-fusion.dtbo ti/k3-v3link-imx219-0-0.dtbo
+      => boot
+
+      # For using two CSI TX on V3Link fusion to two CSI RX on AM69A SK
+      => setenv name_overlays ti/k3-am68-sk-v3link-fusion-dual-csitx.dtbo ti/k3-v3link-imx219-0-2.dtbo ti/k3-v3link-imx219-0-3.dtbo ti/k3-v3link-imx219-1-0.dtbo ti/k3-v3link-imx219-1-1.dtbo
+      => boot
+      # After booting, configure routing on the V3Link fusion for the above setup using the following commands:
+      => media-ctl -R '"ds90ub960 5-0030" [2/0 -> 4/2 [1], 3/0 -> 4/3 [1]]'
+      => media-ctl -R '"ds90ub960 6-0030" [0/0 -> 5/0 [1], 1/0 -> 5/1 [1]]'
+      => media-ctl --set-v4l2 '"ds90ub960 5-0030" 2/0 [fmt:SRGGB8_1X8/1920x1080 field:none]'
+      => media-ctl --set-v4l2 '"ds90ub960 5-0030" 3/0 [fmt:SRGGB8_1X8/1920x1080 field:none]'
+      => media-ctl --set-v4l2 '"ds90ub960 6-0030" 0/0 [fmt:SRGGB8_1X8/1920x1080 field:none]'
+      => media-ctl --set-v4l2 '"ds90ub960 6-0030" 1/0 [fmt:SRGGB8_1X8/1920x1080 field:none]'
+      # The two CSI TX configuration on V3Link fusion described above can be used on relevant platforms using similar commands.
 
    To enable IMX219 camera connected to the 22-pin FFC connector on AM69A SK,
    enable the sensor overlay at U-boot prompt:
@@ -917,11 +925,17 @@ Enabling camera sensors
       +--------------+---------------------------------------+-----------------------------------+
       | J784S4       | FPDLink fusion 1 EVM, IMX390          | SRGGB12_1X12/1936x1100 at 30 fps  |
       +--------------+---------------------------------------+-----------------------------------+
+      | J784S4       | FPDLink fusion 2 EVM, IMX390          | SRGGB12_1X12/1936x1100 at 30 fps  |
+      +--------------+---------------------------------------+-----------------------------------+
+      | J784S4       | DS90UB954-Q1 EVM, IMX390              | SRGGB12_1X12/1936x1100 at 30 fps  |
+      +--------------+---------------------------------------+-----------------------------------+
       | AM69A        | IMX219 RPi Camera                     | SRGGB8_1X8/1920x1080 at 30 fps    |
       +--------------+---------------------------------------+-----------------------------------+
       | AM69A        | LI OV5640 MIPI CSI Camera             | YUYV8_1X16/1280x720 at 30 fps     |
       +--------------+---------------------------------------+-----------------------------------+
       | AM69A        | FPDLink fusion 1 EVM, IMX390          | SRGGB12_1X12/1936x1100 at 30 fps  |
+      +--------------+---------------------------------------+-----------------------------------+
+      | AM69A        | V3Link fusion, IMX219                 | SRGGB8_1X8/1920x1080 at 30 fps    |
       +--------------+---------------------------------------+-----------------------------------+
       | J742S2       | FPDLink fusion 1 EVM, IMX390          | SRGGB12_1X12/1936x1100 at 30 fps  |
       +--------------+---------------------------------------+-----------------------------------+
@@ -949,6 +963,10 @@ Enabling camera sensors
       => setenv name_overlays ti/k3-j721s2-evm-fusion.dtbo ti/k3-fpdlink-imx390-rcm-0-0.dtbo
       => boot
 
+      # For single IMX219 connected to RX port 0 on V3Link fusion on J722S EVM:
+      => setenv name_overlays ti/k3-j722s-evm-v3link-fusion.dtbo ti/k3-v3link-imx219-0-0.dtbo
+      => boot
+
    For more details on building or applying overlays permanently, refer to the
    :ref:`How to enable DT overlays in linux <howto_dt_overlays>` guide.
 
@@ -966,4 +984,6 @@ Enabling camera sensors
       | J722S        | FPDLink fusion 1 EVM, IMX390          | SRGGB12_1X12/1936x1100 at 30 fps  |
       +--------------+---------------------------------------+-----------------------------------+
       | J722S        | IMX219 RPi Camera                     | SRGGB8_1X8/1920x1080 at 30 fps    |
+      +--------------+---------------------------------------+-----------------------------------+
+      | J722S        | V3Link fusion, IMX219                 | SRGGB8_1X8/1920x1080 at 30 fps    |
       +--------------+---------------------------------------+-----------------------------------+

@@ -81,19 +81,27 @@ Flashing SD Card
      :header-rows: 1
 
      * - Switch Label
-       - SW2: 12345678
-       - SW3: 12345678
+       - SW5: 12345678
+       - SW4: 12345678
 
      * - SD
        - 01000000
        - 11000010
 
-- Go in :file:`out` directory in android environment and launch this command:
+- Go in :file:`out` directory in android environment.
 
   .. code-block:: console
 
      $ cd out/target/product/am62p
      $ sudo ./flashall.sh --board="am62px-sk" --sdcard="/dev/sdX"
+
+  .. note::
+
+     To disable AVB, pass the ``--disable-avb`` argument to :file:`flashall.sh`:
+
+     .. code-block:: console
+
+        $ sudo ./flashall.sh --board="am62px-sk" --sdcard="/dev/sdX" --disable-avb
 
 :file:`flashall.sh` **script print in your console instruction to do**
 

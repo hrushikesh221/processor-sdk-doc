@@ -36,7 +36,6 @@ linux/Foundational_Components/U-Boot/UG-UART
 linux/Foundational_Components/U-Boot/UG-UFS
 linux/Foundational_Components/U-Boot/UG-DDR3
 linux/Foundational_Components/U-Boot/Applications
-linux/Foundational_Components/U-Boot/Apps-SPL-Debug
 linux/Foundational_Components/U-Boot/Apps-SPL-Debug-OpenOCD
 linux/Foundational_Components/U-Boot/Apps-Load-in-CCS
 linux/Foundational_Components/U-Boot/Apps-Splash-Screen
@@ -45,7 +44,7 @@ linux/Foundational_Components_Kernel
 linux/Foundational_Components_Kernel_Drivers
 linux/Foundational_Components/Kernel/Kernel_Drivers/ADC
 linux/Foundational_Components/Kernel/Kernel_Drivers/Audio
-linux/Foundational_Components/Kernel/Kernel_Drivers/Crypto
+linux/Foundational_Components/Kernel/Kernel_Drivers/Crypto/SA2UL_OMAP
 linux/Foundational_Components/Kernel/Kernel_Drivers/DCAN
 linux/Foundational_Components/Kernel/Kernel_Drivers/Display/LCDC
 linux/Foundational_Components/Kernel/Kernel_Drivers/GPIO
@@ -94,10 +93,9 @@ linux/Foundational_Components_Machine_Learning
 linux/Foundational_Components/Machine_Learning/armnn
 linux/Foundational_Components/Machine_Learning/tidl
 linux/Foundational_Components/Machine_Learning/tflite
-linux/Foundational_Components/Machine_Learning/neo
 linux/Foundational_Components/Machine_Learning/tvm
 
-linux/Foundational_Components_Graphics
+linux/Foundational_Components/Graphics/index
 linux/Foundational_Components/Graphics/Common/Display
 linux/Foundational_Components/Graphics/Common/GTK+_Graphics_Framework
 linux/Foundational_Components/Graphics/Common/OpenGL_ES
@@ -105,7 +103,6 @@ linux/Foundational_Components/Graphics/Common/PVR_Tools
 linux/Foundational_Components/Graphics/Common/QT_Graphics_Framework
 linux/Foundational_Components/Graphics/Common/Weston
 linux/Foundational_Components/Graphics/SGX/AM3_Beagle_Bone_Black_Configuration
-linux/Foundational_Components/Graphics/SGX/Migration_From_Prior_Releases
 linux/Foundational_Components/Graphics/SGX/OMAP_DRM
 linux/Foundational_Components/Graphics/SGX/Overview
 linux/Foundational_Components/Graphics/SGX/SGX_Debug_Info

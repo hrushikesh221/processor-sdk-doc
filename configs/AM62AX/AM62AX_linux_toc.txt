@@ -1,6 +1,5 @@
 devices/AM62AX/index
 devices/AM62AX/index_RTOS
-devices/AM62AX/index_Applications
 devices/AM62AX/linux/Overview
 devices/AM62AX/linux/Overview_Getting_Started_Guide
 devices/AM62AX/linux/Overview/Build_and_Run_the_Demos
@@ -39,7 +38,6 @@ linux/Foundational_Components/U-Boot/UG-DDRSS
 linux/Foundational_Components/U-Boot/UG-RemoteProc
 
 linux/Foundational_Components/U-Boot/Applications
-linux/Foundational_Components/U-Boot/Apps-SPL-Debug
 linux/Foundational_Components/U-Boot/Apps-SPL-Debug-OpenOCD
 linux/Foundational_Components/U-Boot/Apps-Load-in-CCS
 linux/Foundational_Components/U-Boot/Apps-TroubleShooting
@@ -48,7 +46,7 @@ linux/Foundational_Components_Kernel
 linux/Foundational_Components_Kernel_Drivers
 linux/Foundational_Components/Kernel/Kernel_Drivers/Audio
 linux/Foundational_Components/Kernel/Kernel_Drivers/Camera/CSI2RX
-linux/Foundational_Components/Kernel/Kernel_Drivers/Crypto
+linux/Foundational_Components/Kernel/Kernel_Drivers/Crypto/SA2UL_OMAP
 linux/Foundational_Components/Kernel/Kernel_Drivers/Display/DSS7
 linux/Foundational_Components/Kernel/Kernel_Drivers/DM-Timer
 linux/Foundational_Components/Kernel/Kernel_Drivers/EQEP
@@ -88,6 +86,7 @@ linux/Foundational_Components/Power_Management/pm_sw_arch
 linux/Foundational_Components/Power_Management/pm_debug
 
 linux/Foundational_Components/System_Security/SELinux
+linux/Foundational_Components/System_Security/Auth_boot
 
 linux/Foundational_Components_Kernel_Users_Guide
 linux/Foundational_Components_Kernel_LTP-DDT_Validation
@@ -114,6 +113,8 @@ linux/How_to_Guides/Host/K3_Resource_Partitioning_Tool
 linux/How_to_Guides/Host/SYSFW_Trace_Parser
 linux/How_to_Guides/Target/Processor_SDK_Linux_File_System_Optimization_Customization
 linux/How_to_Guides/Target/How_to_boot_quickly
+linux/How_to_Guides/Target/How_to_emmc_boot
+linux/How_to_Guides/Target/How_to_mmcsd_boot_emmc_uda
 linux/How_to_Guides/Target/How_to_test_MCAN_on_AM62x
 linux/How_to_Guides/Target/How_to_enable_DT_overlays_in_linux
 linux/How_to_Guides/Target/How_To_Enable_M2CC3301_in_linux
@@ -125,7 +126,9 @@ linux/How_to_Guides/FAQ/How_to_Check_Device_Tree_Info
 linux/How_to_Guides/FAQ/How_to_Integrate_Open_Source_Software
 linux/How_to_Guides/Host/How_to_Build_a_Ubuntu_Linux_host_under_VMware
 linux/How_to_Guides_Hardware_Setup_with_CCS
+linux/How_to_Guides/Target/How_To_Carve_Out_CMA
 
-system/Demo_User_Guides/Edge_AI_Gallery_User_Guide
+linux/Demo_User_Guides/index_Demos
+linux/Demo_User_Guides/Edge_AI_Gallery_User_Guide
 
 linux/Documentation_Tarball

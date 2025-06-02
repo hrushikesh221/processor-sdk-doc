@@ -13,8 +13,6 @@ to start Linux development on the TI microprocessor.
 +----------------------------------------------+----------------------------------------------------------------------+
 | PSDK Linux AM62x Installer (Linux version)   | ti-processor-sdk-linux-am62xx-evm-<version>-Linux-x86-Install.bin    |
 +----------------------------------------------+----------------------------------------------------------------------+
-| PSDK Linux AM62SIP Installer (Linux version) | ti-processor-sdk-linux-am62xxsip-evm-<version>-Linux-x86-Install.bin |
-+----------------------------------------------+----------------------------------------------------------------------+
 
 Use Linux installer for complete source package, tools, prebuilt-image, filesystems,
 etc for product development.
@@ -69,10 +67,6 @@ window and change directories to where the installer is located
     chmod +x ./ti-processor-sdk-linux-am62xx-evm-<version>-Linux-x86-Install.bin
     ./ti-processor-sdk-linux-am62xx-evm-<version>-Linux-x86-Install.bin
 
-    # For AM62SIP (am62xxsip-evm) Installer
-    chmod +x ./ti-processor-sdk-linux-am62xxsip-evm-<version>-Linux-x86-Install.bin
-    ./ti-processor-sdk-linux-am62xxsip-evm-<version>-Linux-x86-Install.bin
-
 Alternatively, you can give execute permissions and run the SDK Installer
 by double clicking on it within your Linux host PC.
 
@@ -91,8 +85,8 @@ by double clicking on it within your Linux host PC.
 .. note::
    Processor SDK Linux AM62x contains only the Linux specific source and application intended
    to runs on A53/Linux core. For R5F and RTOS/NO-RTOS side source and applications, refer **MCU+ SDK**
-   package `[Use Link] <https://software-dl.ti.com/mcu-plus-sdk/esd/AM62X/10_01_00_33/exports/docs/api_guide_am62x/index.html>`__.
+   package `[Use Link] <https://software-dl.ti.com/mcu-plus-sdk/esd/AM62X/latest/exports/docs/api_guide_am62x/index.html>`__.
 
 **Instructions to set-up CCS**
 
--  Refer `[Use Link] <https://software-dl.ti.com/mcu-plus-sdk/esd/AM62X/10_01_00_33/exports/docs/api_guide_am62x/CCS_SETUP_PAGE.html>`__
+-  Refer `[Use Link] <https://software-dl.ti.com/mcu-plus-sdk/esd/AM62X/latest/exports/docs/api_guide_am62x/CCS_SETUP_PAGE.html>`__

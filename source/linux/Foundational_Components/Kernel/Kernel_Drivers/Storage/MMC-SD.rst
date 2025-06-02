@@ -69,7 +69,7 @@ Features
    -  SD cards including SD High Speed and SDHC cards
    -  Uses block bounce buffer to aggregate scattered blocks
 
-.. ifconfig:: CONFIG_part_family in ('J7_family', 'AM62PX_family')
+.. ifconfig:: CONFIG_part_family in ('J7_family')
 
    The SD/MMC driver supports the following features:
 
@@ -78,7 +78,7 @@ Features
    - Support for both built-in and module mode
    - ext2/ext3/ext4 file system support
 
-.. ifconfig:: CONFIG_part_family in ('AM62X_family', 'AM62AX_family', 'AM64X_family')
+.. ifconfig:: CONFIG_part_family in ('AM62X_family', 'AM62AX_family', 'AM64X_family', 'AM62LX_family', 'AM62PX_family')
 
    The SD/MMC driver supports the following features:
 
@@ -86,6 +86,8 @@ Features
    - HS200 speed mode
    - Support for both built-in and module mode
    - ext2/ext3/ext4 file system support
+
+.. _mmc-sd-supported-hs-modes:
 
 SD: Supported High Speed Modes
 ******************************
@@ -208,18 +210,19 @@ SD: Supported High Speed Modes
 
    J721e-sk and AM68-sk does not support eMMC.
 
-.. ifconfig:: CONFIG_part_variant in ('AM62X', 'AM62AX', 'AM64X', 'AM62PX' )
+.. ifconfig:: CONFIG_part_variant in ('AM62X', 'AM62AX', 'AM64X', 'AM62PX' ,'AM62LX')
 
    * SD
 
    .. csv-table::
-      :header: "Platform", "SDR104", "DDR50", "SDR50", "SDR25", "SDR12"
+      :header: "Platform", "SDR12", "SDR25", "SDR50", "DDR50", "SDR104"
       :widths: auto
 
       AM62*, Y, Y, Y, Y, Y
       AM62ax, Y, Y, Y, Y, Y
       am64x, Y, Y, Y, Y, Y
       am62px, Y, Y, Y, Y, Y
+      am62lx, N, N, N, N, N
 
    * eMMC
 
@@ -230,7 +233,8 @@ SD: Supported High Speed Modes
       AM62*, Y, Y, N
       AM62ax, Y, Y, N
       am64x, Y, Y, N
-      am62px, Y, Y, Y
+      am62px, Y, Y, N
+      am62lx, Y, Y, N
 
 Driver Configuration
 ********************
@@ -250,11 +254,11 @@ Driver Configuration
       :name: building-into-kernel-mmcsd
 
    Ensure that the following config options are set to 'y':
-	* CONFIG_MMC
-	* CONFIG_MMC_BLOCK
-	* CONFIG_MMC_SDHCI
-	* CONFIG_MMC_SDHCI_OMAP  (for DRA7XX and AM57XX devices)
-	* CONFIG_MMC_OMAP        (for AM335X and AM437X devices)
+   * CONFIG_MMC
+   * CONFIG_MMC_BLOCK
+   * CONFIG_MMC_SDHCI
+   * CONFIG_MMC_SDHCI_OMAP  (for DRA7XX and AM57XX devices)
+   * CONFIG_MMC_OMAP        (for AM335X and AM437X devices)
 
    .. rubric:: **Building as Loadable Kernel Module**
 
@@ -278,7 +282,7 @@ Driver Configuration
    modules will be loaded and any valid filesystem will be automatically mounted
    if they exist on the card.
 
-.. ifconfig:: CONFIG_part_family in ('J7_family', 'AM62X_family', 'AM64X_family', 'AM62AX_family', 'AM62PX_family')
+.. ifconfig:: CONFIG_part_family in ('J7_family', 'AM62X_family', 'AM64X_family', 'AM62AX_family', 'AM62PX_family', 'AM62LX_family')
 
    The default kernel configuration enables support for MMC/SD driver as
    built-in to kernel. TI SDHCI driver is used. Following options need to be
@@ -438,7 +442,7 @@ Driver Configuration
             pinctrl-0 = <&main_mmc1_pins_default>;
             ti,driver-strength-ohm = <50>;
             disable-wp;
-            sdhci-caps-mask = <0x00000006 0x00000000>; /* Limiting to SDR50 speed mode */
+            sdhci-caps-mask = <0x00000003 0x00000000>; /* Limiting to DDR50 speed mode */
          };
 
       Limiting to SD HS speed mode can also be done by using the property
@@ -479,18 +483,69 @@ Driver Configuration
 
          sdhci2: mmc@fa20000 {
 
+eMMC HS400 support in Linux
+===========================
+
+.. ifconfig:: CONFIG_part_family in ('AM62PX_family')
+
+   For 11.0 SDK, am62px device does not support eMMC HS400 mode due to errata i2458.
+   If support for HS400 is anyways required, please add the following DT attributes to sdhci0 node:
+
+   .. code-block:: diff
+
+      diff --git a/arch/arm64/boot/dts/ti/k3-am62p-j722s-common-main.dtsi b/arch/arm64/boot/dts/ti/k3-am62p-j722s-common-main.dtsi
+      index 3e5ca8a3eb86..a05b22a6e5a2 100644
+      --- a/arch/arm64/boot/dts/ti/k3-am62p-j722s-common-main.dtsi
+      +++ b/arch/arm64/boot/dts/ti/k3-am62p-j722s-common-main.dtsi
+      @@ -593,12 +593,16 @@ sdhci0: mmc@fa10000 {
+                      bus-width = <8>;
+                      mmc-ddr-1_8v;
+                      mmc-hs200-1_8v;
+      +               mmc-hs400-1_8v;
+                      ti,clkbuf-sel = <0x7>;
+                      ti,trm-icp = <0x8>;
+      +               ti,strobe-sel = <0x55>;
+                      ti,otap-del-sel-legacy = <0x1>;
+                      ti,otap-del-sel-mmc-hs = <0x1>;
+                      ti,otap-del-sel-ddr52 = <0x6>;
+                      ti,otap-del-sel-hs200 = <0x8>;
+      +               ti,otap-del-sel-hs400 = <0x5>; // at 0.85V VDD_CORE
+      +               //ti,otap-del-sel-hs400 = <0x7>; // at 0.75V VDD_CORE
+                      ti,itap-del-sel-legacy = <0x10>;
+                      ti,itap-del-sel-mmc-hs = <0xa>;
+                      ti,itap-del-sel-ddr52 = <0x3>;
+
+.. ifconfig:: CONFIG_part_family not in ('AM62PX_family')
+
+	eMMC HS400 is not suppported, refer to :ref:`this <mmc-sd-supported-hs-modes>` table for the list of modes supported in Linux
+	for |__PART_FAMILY_NAME__| SoC.
+
 |
 
-.. _create-partitions-in-emmc-uda-from-linux:
+.. _mmc-listing-mmc-devices-linux:
 
-Create software partitions in eMMC UDA
-**************************************
+Listing MMC devices from Linux
+******************************
+eMMC and SD cards are registered to the MMC subsystem and availiable as a block device
+as :file:`/dev/mmcblk{n}`. To find which device index **n** corresponds to eMMC device,
+check which device includes :file:`mmcblk{n}boot0` and :file:`mmcblk{n}boot1`. Here,
+mmcblk0* is in eMMC.
 
-In eMMC, the User Data Area (UDA) HW partition is the primary storage
-space generally used to flash the rootfs. To prepare the UDA, use
-the :command:`fdisk` command. For ex: :samp:`fdisk /dev/mmcblkN` in
-which **N** is 0 or 1. To find which integer is eMMC use the command
-:command:`lsblk`, like so:
+.. code-block:: console
+
+   root@<machine>:~# ls -l /dev/mmcblk*
+   brw-rw---- 1 root disk 179,  0 Jan  1 00:10 /dev/mmcblk0
+   brw-rw---- 1 root disk 179, 32 Jan  8  2025 /dev/mmcblk0boot0
+   brw-rw---- 1 root disk 179, 64 Jan  8  2025 /dev/mmcblk0boot1
+   brw-rw---- 1 root disk 179,  1 Jan  1 00:14 /dev/mmcblk0p1
+   crw------- 1 root root 239,  0 Jan  1 00:00 /dev/mmcblk0rpmb
+   brw-rw---- 1 root disk 179, 96 Jan  8  2025 /dev/mmcblk1
+   brw-rw---- 1 root disk 179, 97 Jan  1 00:00 /dev/mmcblk1p1
+   brw-rw---- 1 root disk 179, 98 Jan  8  2025 /dev/mmcblk1p2
+
+The disk partitions for each MMC device are displayed as :file:`/dev/mmcblk{n}p{x}`,
+to see what disk partitions exist for an eMMC device and if they are mounted, use the
+command :command:`lsblk`, like so:
 
 .. code-block:: console
 
@@ -503,51 +558,284 @@ which **N** is 0 or 1. To find which integer is eMMC use the command
    |-mmcblk1p1  179:97   0  128M  0 part /run/media/boot-mmcblk1p1
    `-mmcblk1p2  179:98   0  1.9G  0 part /
 
-Where the eMMC will have hardware partitions :file:`mmcblkNboot0`
-and :file:`mmcblkNboot1`. The :file:`mmcblkN` is the eMMC device.
+Use the :command:`mount` and :command:`umount` commands to mount and unmount disk partitions
+if they are formated, usally to vfat or ext4 types.
 
-Now we use :samp:`fdisk /dev/mmcblk0` to create one software partition
-in UDA. For documentation on using fdisk, please go to:
-`fdisk how-to <https://tldp.org/HOWTO/Partition/fdisk_partitioning.html>`__.
+.. _mmc-create-partitions-in-emmc-linux:
 
-.. _formatting-mmc-partition-from-linux:
+Create partitions in eMMC UDA
+*****************************
+
+In eMMC, the User Data Area (UDA) HW partition is the primary storage space generally used
+to flash the rootfs. To create disk partitions in UDA, use the :command:`fdisk` command.
+For ex: :samp:`fdisk /dev/mmcblk{n}` in which **n** is typically 0 or 1. In the example above,
+eMMC is :samp:`fdisk /dev/mmcblk0`.
+
+For documentation on using fdisk, please go to: `fdisk how-to <https://tldp.org/HOWTO/Partition/fdisk_partitioning.html>`__.
+
+**Erase eMMC UDA**
+
+In Linux, before creating disk partitions, we can optionally erase eMMC UDA using :command:`dd`
+command:
+
+.. code-block:: console
+
+   root@<machine>:~# umount /dev/mmcblk0*
+   root@<machine>:~# dd if=/dev/zero of=/dev/mmcblk0 bs=1M count=n
+
+where ``n`` should be determined according the the following formula: ``count = total size UDA (bytes) / bs``.
+
+.. _mmc-create-boot-partition-emmc-linux:
+
+Create "boot" partition
+=======================
+
+In this example create a "boot" partition of size 400 MiB which can be formatted to vfat type
+and will store the bootloader binaries.
+
+.. code-block:: console
+
+   root@<machine>:~# fdisk /dev/mmcblk0
+
+   Welcome to fdisk (util-linux 2.39.3).
+   Changes will remain in memory only, until you decide to write them.
+   Be careful before using the write command.
+
+   Command (m for help): n
+   Partition type
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended (container for logical partitions)
+   Select (default p):
+
+   Using default response p.
+   Partition number (1-4, default 1):
+   First sector (2048-31080447, default 2048):
+   Last sector, +/-sectors or +/-size{K,M,G,T,P} (2048-31080447, default 31080447): +400M
+
+   Created a new partition 1 of type 'Linux' and of size 400 MiB.
+   Partition #1 contains a vfat signature.
+
+   Do you want to remove the signature? [Y]es/[N]o: y
+
+   The signature will be removed by a write command.
+
+   Command (m for help): a
+   Selected partition 1
+   The bootable flag on partition 1 is enabled now.
+
+   Command (m for help): t
+   Selected partition 1
+   Hex code or alias (type L to list all): c
+   Changed type of partition 'Linux' to 'W95 FAT32 (LBA)'.
+
+   Command (m for help): w
+   The partition table has been altered.
+   [  644.818358]  mmcblk0: p1
+   Calling ioctl() to re-read partition table.
+   Syncing disks.
+
+Make sure bootable flag is set for "boot" partition, ROM may not boot from this patitition
+if bootable flag is not set.
+
+.. _mmc-create-root-partition-emmc-linux:
+
+Create "root" partition
+=======================
+
+In this example create a "root" partition which can be formatted to ext4 type and will store
+Linux kernel Image, DTB, and the rootfs.
+
+.. code-block:: console
+
+   root@<machine>:~# fdisk /dev/mmcblk0
+
+   Welcome to fdisk (util-linux 2.39.3).
+   Changes will remain in memory only, until you decide to write them.
+   Be careful before using the write command.
+
+   This disk is currently in use - repartitioning is probably a bad idea.
+   It's recommended to umount all file systems, and swapoff all swap
+   partitions on this disk.
+
+
+   Command (m for help): n
+   Partition type
+   p   primary (1 primary, 0 extended, 3 free)
+   e   extended (container for logical partitions)
+   Select (default p):
+
+   Using default response p.
+   Partition number (2-4, default 2):
+   First sector (821248-31080447, default 821248):
+   Last sector, +/-sectors or +/-size{K,M,G,T,P} (821248-31080447, default 31080447):
+
+   Created a new partition 2 of type 'Linux' and of size 14.4 GiB.
+
+   Command (m for help): t
+   Partition number (1,2, default 2): 2
+   Hex code or alias (type L to list all): 83
+
+   Changed type of partition 'Linux' to 'Linux'.
+
+   Command (m for help): w
+   The partition table has been altered.
+   Syncing disks.
+
+.. _mmc-format-partition-linux:
 
 Formatting eMMC partitions from Linux
 *************************************
 
-After creating a partition/s, the partition can be formated with
-the :command:`mkfs` command. For ex: :samp:`mkfs -t ext4 /dev/mmcblkN`
-where **mmcblkN** is the MMC device with the software partition to format.
-The general syntax for formatting disk partitions in Linux is:
+After creating a partition/s, the partition can be formated with the :command:`mkfs` command.
+For ex: :samp:`mkfs -t ext4 /dev/mmcblk{n}` where **mmcblk{n}** is the MMC device with the new
+disk partitions to format. The general syntax for formatting disk partitions in Linux is:
 
 .. code-block:: console
 
-   mkfs [options] [-t type fs-options] device [size]
+   mkfs.vfat [OPTIONS] TARGET [BLOCKS]
+   mkfs.ext4 [-c|-l filename] [-b block-size] [-C cluster-size]
 
-For example, to format a partition in eMMC UDA to ext4 file system:
+.. _mmc-format-partition-vfat:
+
+Format to vfat
+==============
+
+In this example, format the "boot" partition to type vfat.
+
+.. code-block:: console
+
+   root@<machine>:~# mkfs.vfat -F 32 -n "boot" /dev/mmcblk0p1
+
+.. _mmc-format-partition-ext4:
+
+Format to ext4
+==============
+
+In this example, format the "root" partition to type ext4.
+
+.. code-block:: console
+
+   root@<machine>:~# mkfs.ext4 -L "root" /dev/mmcblk0p2
+
+**Verify partitions**
+
+   Verify setup of :file:`mmcblk0p1` and :file:`mmcblk0p2` with :command:`lsblk` command.
+
+   .. code-block:: console
+
+      root@<machine>:~# lsblk -o name,mountpoint,label,size,uuid
+      NAME         MOUNTPOINT                LABEL  SIZE UUID
+      mmcblk0                                      14.8G
+      |-mmcblk0p1                            boot   400M E4D4-4879
+      `-mmcblk0p2                            root  14.4G 74d40075-07e4-4bce-9401-6fccef68e934
+      mmcblk0boot0                                 31.5M
+      mmcblk0boot1                                 31.5M
+      mmcblk1                                      29.7G
+      |-mmcblk1p1  /run/media/boot-mmcblk1p1 boot   128M 681F-55DD
+      `-mmcblk1p2  /                         root   8.7G ead4c8bb-fa37-4c4d-9ba3-47a1f3824764
+
+.. _mmc-flash-emmc-uda:
+
+Flash eMMC for MMCSD boot
+*************************
+
+In this example, we show one simple method for flashing to eMMC for MMCSD boot from
+eMMC UDA in FS mode. Please know this is not the only method for flashing the eMMC
+for this bootmode.
+
+This example assumes the current bootmode is MMCSD boot from SD (FS mode)
+
+.. _mmc-flash-emmc-uda-boot:
+
+Flash to eMMC "boot" partition
+==============================
+
+.. code-block:: console
+
+   root@<machine>:~# umount /run/media/*
+   root@<machine>:~# mkdir /mnt/eboot /mnt/sdboot
+   root@<machine>:~# mount /dev/mmcblk0p1 /mnt/eboot
+   root@<machine>:~# mount /dev/mmcblk1p1 /mnt/sdboot
+
+Verify the partitions are mounted to the correct folders using :command:`lsblk` command in the
+column labeled :file:`MOUNTPOINTS`.
 
 .. code-block:: console
 
    root@<machine>:~# lsblk
    NAME         MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
    mmcblk0      179:0    0 14.8G  0 disk
-   `-mmcblk0p1  179:1    0 14.8G  0 part /run/media/mmcblk0p1
+   |-mmcblk0p1  179:1    0  400M  0 part /mnt/eboot
+   `-mmcblk0p2  179:2    0 14.4G  0 part
    mmcblk0boot0 179:32   0 31.5M  1 disk
    mmcblk0boot1 179:64   0 31.5M  1 disk
-   mmcblk1      179:96   0 14.8G  0 disk
-   |-mmcblk1p1  179:97   0  128M  0 part /run/media/boot-mmcblk1p1
-   `-mmcblk1p2  179:98   0  8.8G  0 part /
-   root@<machine>:~# umount /run/media/mmcblk0p1
-   [   43.648532] EXT4-fs (mmcblk0p1): unmounting filesystem f8ecc7b8-ab1a-4240-ab4b-470d242c0539.
-   root@<machine>:~# mkfs -t ext4 /dev/mmcblk0p1
-   mke2fs 1.47.0 (5-Feb-2023)
-   Discarding device blocks: done
-   Creating filesystem with 3884800 4k blocks and 972944 inodes
-   Filesystem UUID: 842929dd-4e57-47b6-afa1-c03abc3100b1
-   Superblock backups stored on blocks:
-      32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208
+   mmcblk1      179:96   0 29.7G  0 disk
+   |-mmcblk1p1  179:97   0  128M  0 part /mnt/sdboot
+   `-mmcblk1p2  179:98   0  8.7G  0 part /
 
-   Allocating group tables: done
-   Writing inode tables: done
-   Creating journal (16384 blocks): done
-   Writing superblocks and filesystem accounting information: done
+Now we can copy bootloader binaries to eMMC and umount the partitions when writes finish.
+
+.. code-block:: console
+
+   root@<machine>:~# ls /mnt/sdboot/
+   tiboot3.bin  tispl.bin	u-boot.img  uEnv.txt
+   root@<machine>:~# cp /mnt/sdboot/* /mnt/eboot/
+   root@<machine>:~# sync && umount /mnt/*
+
+.. _mmc-flash-emmc-uda-root:
+
+Flash to eMMC "root" partition
+==============================
+
+.. code-block:: console
+
+   root@<machine>:~# umount /run/media/*
+   root@<machine>:~# mkdir /mnt/eroot /mnt/sdroot
+   root@<machine>:~# mount /dev/mmcblk0p2 /mnt/eroot
+   [69229.982452] EXT4-fs (mmcblk0p2): mounted filesystem 74d40075-07e4-4bce-9401-6fccef68e934 r/w with ordered data mode. Quota mode: none.
+   root@<machine>:~# mount /dev/mmcblk1p2 /mnt/sdroot
+
+Verify the partitions are mounted to the correct folders using :command:`lsblk` command in the
+column labeled :file:`MOUNTPOINTS`.
+
+.. code-block:: console
+
+   root@<machine>:~# lsblk
+   NAME         MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+   mmcblk0      179:0    0 14.8G  0 disk
+   |-mmcblk0p1  179:1    0  400M  0 part
+   `-mmcblk0p2  179:2    0 14.4G  0 part /mnt/eroot
+   mmcblk0boot0 179:32   0 31.5M  1 disk
+   mmcblk0boot1 179:64   0 31.5M  1 disk
+   mmcblk1      179:96   0 29.7G  0 disk
+   |-mmcblk1p1  179:97   0  128M  0 part
+   `-mmcblk1p2  179:98   0  8.7G  0 part /mnt/sdroot
+                                         /
+
+Now we can copy rootfs to eMMC (either from SD rootfs or from tarball) and umount the partitions
+when writes finish.
+
+**From SD**
+
+.. code-block:: console
+
+   root@<machine>:~# ls /mnt/sdroot
+   bin   dev  home  lost+found  mnt  proc	run   srv  tmp	var
+   boot  etc  lib	 media	     opt  root	sbin  sys  usr
+   root@<machine>:~# cp -r -a /mnt/sdroot/* /mnt/eroot
+   root@<machine>:~# sync
+   root@<machine>:~# umount /mnt/*
+   [70154.205154] EXT4-fs (mmcblk0p2): unmounting filesystem 74d40075-07e4-4bce-9401-6fccef68e934.
+
+**From tarball**
+
+This sections requires for tisdk-base-image-<soc>evm.rootfs.tar.xz to have been previously copied
+to the SD card rootfs.
+
+.. code-block:: console
+
+   root@<machine>:~# ls
+   tisdk-base-image-<soc>-evm.rootfs.tar.xz
+   root@<machine>:~# tar -xpf tisdk-base-image-<soc>-evm.rootfs.tar.xz -C /mnt/eroot
+   root@<machine>:~# sync
+   root@<machine>:~# umount /mnt/*

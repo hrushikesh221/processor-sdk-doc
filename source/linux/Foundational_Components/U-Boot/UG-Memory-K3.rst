@@ -16,9 +16,9 @@ Listing MMC devices
 ===================
 
 Usually in all the platforms there will be two MMC instances of which one
-would be SD and the other would be eMMC. The index of them can vary from
-one class of platforms to the other. For a given platform, the device
-number: **mmcdev=[0:1]** can be found in the following way:
+would be SD and the other would be eMMC. The device index of them can vary from
+one class of platforms to the other. For a given platform, the device index
+can be found in the following way:
 
 .. code-block:: console
 
@@ -26,13 +26,34 @@ number: **mmcdev=[0:1]** can be found in the following way:
    sdhci@fa10000: 0 (eMMC)
    sdhci@fa00000: 1 (SD)
 
-The device number "**0**" for eMMC will be needed when flashing to the eMMC device
-in: :ref:`flash-and-boot-to-uboot-prompt`.
+The device index "**0**" for eMMC will be used when flashing to the eMMC device
+:ref:`here <how-to-emmc-boot>` using :command:`mmc dev` command.
+
+In u-boot environment, usually **mmcdev=n** is used to selct which MMC device to boot
+Linux from, where **n** is the device index.
+
+MMC HW partitions
+=================
+
+This sections includes a summary of MMC hardware partitions.
+
+**eMMC**
+
+   Normally eMMC is divided into 4 areas (aka HW partitions):
+
+   - UDA (User Data Area): Used to store user data such as a file system. This partition can divided into disk partitions
+   - Boot0/1: Used to store firmware and data needed during boot
+   - RPMB (Replay-protected memory-block area): Used to store secure data
+
+**SD**
+
+   SD card memory is not divided into sections like eMMC, but acts like UDA in eMMC where user can
+   create disk partitions in software allowing to divide the storage space into multiple sections.
 
 .. _uboot-selecting-mmc-device-and-partitions:
 
-Selecting MMC device and paritions
-==================================
+Selecting MMC device and partitions
+===================================
 
 To selct an MMC device in u-boot, the command: :command:`mmc dev` could be used.
 The general syntax is:
@@ -41,16 +62,17 @@ The general syntax is:
 
    => mmc dev [dev] [partition]
 
+Where [dev] is the MMC device index.
+
 The following lists examples and their explanation for each MMC device
-and partitions according to the example in: :ref:`uboot-listing-mmc-devices`.
+and partitions according to the example :ref:`here <uboot-listing-mmc-devices>`.
 
 .. code-block:: console
 
-   => mmc dev 0 0 # select eMMC user HW partition (UDA)
-   => mmc dev 0 1 # select eMMC boot0 HW partition
-   => mmc dev 0 2 # select eMMC boot1 HW partition
-   => mmc dev 1 1 # select SD "boot" partition
-   => mmc dev 1 2 # select SD "root" partition
+   => mmc dev 0 0 # select eMMC UDA
+   => mmc dev 0 1 # select eMMC Boot0
+   => mmc dev 0 2 # select eMMC Boot1
+   => mmc dev 1 # select SD
 
 View MMC partition contents
 ===========================
@@ -60,13 +82,12 @@ boot the device.
 
 .. note::
 
-   For eMMC, typically, the device ships without a partition table If there is
-   a need to create a partition in UDA (to flash the rootfs), please go to:
-   :ref:`create-partitions-in-emmc-uda-from-linux` and format the partition:
-   :ref:`formatting-mmc-partition-from-linux` before proceeding to look at the
-   eMMC partition contents.
+   For eMMC, typically, the device ships without a partition table If there is a need to
+   create a partition in UDA, please go :ref:`here <mmc-create-partitions-in-emmc-uda-from-linux>`
+   and to format the partition go :ref:`here <mmc-formatting-mmc-partition-from-linux>` before
+   proceeding.
 
-To verify partitions in any MMC device from u-boot prompt, use the
+To list disk partitions for any MMC device from u-boot prompt, use the
 command: :command:`mmc part`.
 
 .. code-block:: console
@@ -118,205 +139,31 @@ Where the general syntax is:
 
    $ ls <interface> [<dev[:partition]> [directory]]
 
-.. _flash-and-boot-to-uboot-prompt:
+MMC supported bootmodes
+========================
 
-Flash and boot SPL from eMMC
-============================
+The K3 based processors support and recommends using *eMMC boot* from Boot0/1. For complete
+information on the MMC bootmodes supported by ROM, please refer to the device specific TRM,
+under: :file:`Initialization/Boot Mode Pins`. ROM supports the following two MMC bootmodes:
 
-The K3 based processors supports and recommends booting from the eMMC
-boot0/1 HW partitions. In the following example, we use the :command:`fatload`
-and :command:`mmc write` commands to load binaries from an SD card and write
-them to the eMMC boot0 HW partition:
+**eMMC boot**
 
-.. ifconfig:: CONFIG_part_variant in ('AM64X')
+   This bootmode is a special bootmode specific to eMMC device. In this bootmode, ROM cannot
+   boot from SD and can only boot from Boot0 or Boot1 in eMMC. Please go :ref:`here <how-to-emmc-boot>`
+   for a step-by-step guide to boot with this bootmode.
 
-   .. code-block:: console
+**MMCSD boot**
 
-      => mmc dev 0 1
-      => fatload mmc 1 ${loadaddr} tiboot3.bin
-      => mmc write ${loadaddr} 0x0 0x800
-      => fatload mmc 1 ${loadaddr} tispl.bin
-      => mmc write ${loadaddr} 0x800 0x1000
-      => fatload mmc 1 ${loadaddr} u-boot.img
-      => mmc write ${loadaddr} 0x1800 0x2000
-
-.. ifconfig:: CONFIG_part_variant in ('J7200')
-
-   .. code-block:: console
-
-      => mmc dev 0 1
-      => fatload mmc 1 ${loadaddr} tiboot3.bin
-      => mmc write ${loadaddr} 0x0 0x800
-      => fatload mmc 1 ${loadaddr} tispl.bin
-      => mmc write ${loadaddr} 0x800 0x1000
-      => fatload mmc 1 ${loadaddr} u-boot.img
-      => mmc write ${loadaddr} 0x1800 0x2000
-
-.. ifconfig:: CONFIG_part_variant in ('J721S2', 'AM62X', 'J784S4','J742S2', 'J722S')
-
-   .. code-block:: console
-
-      => mmc dev 0 1
-      => fatload mmc 1 ${loadaddr} tiboot3.bin
-      => mmc write ${loadaddr} 0x0 0x400
-      => fatload mmc 1 ${loadaddr} tispl.bin
-      => mmc write ${loadaddr} 0x400 0x1000
-      => fatload mmc 1 ${loadaddr} u-boot.img
-      => mmc write ${loadaddr} 0x1400 0x2000
-
-.. ifconfig:: CONFIG_part_variant not in ('AM64X', 'J7200', 'J721S2', 'AM62X', 'J784S4','J742S2', 'J722S')
-
-   .. code-block:: console
-
-      => mmc dev 0 1
-      => fatload mmc 1 ${loadaddr} tiboot3.bin
-      => mmc write ${loadaddr} 0x0 0x400
-      => fatload mmc 1 ${loadaddr} tispl.bin
-      => mmc write ${loadaddr} 0x400 0x1000
-      => fatload mmc 1 ${loadaddr} u-boot.img
-      => mmc write ${loadaddr} 0x1400 0x2000
-      => fatload mmc 1 ${loadaddr} sysfw.itb
-      => mmc write ${loadaddr} 0x3600 0x800
-
-eMMC layout
------------
-
-.. ifconfig:: CONFIG_part_variant in ('AM64X', 'J7200')
-
-   .. code-block:: text
-
-      +----------------------------------+0x0      +-------------------------+0x0
-      |      tiboot3.bin (1 MB)          |         |                         |
-      +----------------------------------+0x800    |                         |
-      |       tispl.bin (2 MB)           |         |                         |
-      +----------------------------------+0x1800   |        rootfs           |
-      |       u-boot.img (4 MB)          |         |                         |
-      +----------------------------------+0x3800   |                         |
-      |      environment (128 KB)        |         |                         |
-      +----------------------------------+0x3900   |                         |
-      |   backup environment (128 KB)    |         |                         |
-      +----------------------------------+0x3A00   +-------------------------+
-            boot0 HW partition (8 MB)                     user partition
-
-.. ifconfig:: CONFIG_part_variant in ('J721S2', 'AM62X')
-
-   .. code-block:: text
-
-      +----------------------------------+0x0      +-------------------------+0x0
-      |      tiboot3.bin (1 MB)          |         |                         |
-      +----------------------------------+0x400    |                         |
-      |       tispl.bin (2 MB)           |         |                         |
-      +----------------------------------+0x1400   |        rootfs           |
-      |       u-boot.img (4 MB)          |         |                         |
-      +----------------------------------+0x3400   |                         |
-      |      environment (128 KB)        |         |                         |
-      +----------------------------------+0x3500   |                         |
-      |   backup environment (128 KB)    |         |                         |
-      +----------------------------------+0x3600   +-------------------------+
-            boot0 HW partition (8 MB)                     user partition
-
-.. ifconfig:: CONFIG_part_variant not in ('AM64X', 'J7200', 'J721S2', 'AM62X')
-
-   .. code-block:: text
-
-
-      +----------------------------------+0x0      +-------------------------+0x0
-      |      tiboot3.bin (512 KB)        |         |                         |
-      +----------------------------------+0x400    |                         |
-      |       tispl.bin (2 MB)           |         |                         |
-      +----------------------------------+0x1400   |        rootfs           |
-      |       u-boot.img (4 MB)          |         |                         |
-      +----------------------------------+0x3400   |                         |
-      |      environment (128 KB)        |         |                         |
-      +----------------------------------+0x3500   |                         |
-      |   backup environment (128 KB)    |         |                         |
-      +----------------------------------+0x3600   |                         |
-      |          sysfw (1 MB)            |         |                         |
-      +----------------------------------+0x3E00   +-------------------------+
-            boot0 HW partition (8 MB)                     user partition
-
-eMMC boot configuration
------------------------
-
-To boot from any eMMC, the master (ROM) will require some configuration which can be
-set using the :command:`mmc bootbus` and :command:`mmc partconf` commands.
-
-- The :command:`mmc bootbus` command sets the BOOT_BUS_WIDTH field where :command:`mmc bootbus 0 2 0 0`
-  selects **x8 (sdr/ddr) buswidth in boot operation mode**.
-- The :command:`mmc partconf` command can be used to configure what hardware partition
-  to boot from. The general syntax is:
-
-.. code-block:: console
-
-   $ mmc partconf <dev> [[varname] | [<boot_ack> <boot_partition> <partition_access>]]
-
-- For more information on these commands, please refer to: `MMC CMD <https://docs.u-boot.org/en/latest/usage/cmd/mmc.html//>`__.
-
-**Boot from boot0 HW partition of eMMC:**
-
-.. code-block:: console
-
-   => mmc partconf 0 1 1 1
-   => mmc bootbus 0 2 0 0
-
-**Boot from boot1 HW hardware partition of eMMC:**
-
-.. code-block:: console
-
-   => mmc partconf 0 1 2 1
-   => mmc bootbus 0 2 0 0
-
-.. note::
-
-   When booting from boot1 HW partition, make sure to flash the partition using:
-   :samp:`mmc dev 0 2`.
-
-**Boot from UDA HW partition of eMMC:**
-
-.. code-block:: console
-
-   => mmc partconf 0 1 7 1
-   => mmc bootbus 0 2 0 0
-
-**Enable warm reset**
-
-On eMMC devices, warm reset will not work if EXT_CSD[162] bit is unset since the
-reset input signal will be ignored. Warm reset is required to be enabled in order
-for the eMMC to be in a "clean state" on power-on reset so that ROM can do a clean
-enumeration. To set the EXT_CSD[162] bit, stop at u-boot prompt and execute the
-following command:
-
-.. code-block:: console
-
-   => mmc rst-function 0 1
-
-.. warning::
-
-   This is a write-once field. For more information, please refer to the u-boot
-   doc: `MMC CMD <https://docs.u-boot.org/en/latest/usage/cmd/mmc.html//>`__.
-
-Boot Linux from eMMC
-====================
-
-To flash & boot the rootfs from eMMC UDA HW partition, first prepare UDA:
-:ref:`create-partitions-in-emmc-uda-from-linux`. The new software partition then
-needs to be formatted as a ext4 filesystem: :ref:`formatting-mmc-partition-from-linux`,
-and then the rootfs has to be written. It is not possible to format a partition to ext4
-in U-Boot. The Linux kernel image and DT are expected to be present in the /boot folder
-of rootfs.
-
-To boot Linux from eMMC, use the following commands after flashing rootfs to UDA:
-
-.. code-block:: console
-
-   => setenv mmcdev 0
-   => setenv bootpart 0
-   => boot
+   This bootmode allows to boot from either eMMC or SD device. With this bootmode, ROM can
+   only boot from SD card or UDA in eMMC. ROM allows to boot in RAW or FS mode, FS mode being
+   the recommended option and hence will have a subsequent guide to boot using this mode. Configuration
+   for selecting MMC device and RAW/FS mode, is done with bootmode pins, please refer to TRM for this
+   setup. To boot from eMMC UDA in FS mode, please go :ref:`here <how-to-mmcsd-boot-from-emmc-uda>`.
 
 Flashing an MMC device using USB-DFU
 ====================================
 
-To flash the eMMC device (boot0 HW partition) using USB-DFU, the device should
+To flash the eMMC device (Boot0) using USB-DFU, the device should
 be booted to u-boot prompt and a USB cable connected from the host machine
 to the device USB port configured to USB peripheral mode.
 
@@ -327,8 +174,10 @@ From u-boot prompt execute the following:
    => setenv dfu_alt_info ${dfu_alt_info_emmc}
    => dfu 0 mmc 0
 
-and on the host machine have the bootloader binaries ready to flash
-to eMMC boot0 HW partition. Execute the :command:`dfu-util` to transfer
+This comands assumes eMMC device exists and is mmc device 0.
+
+On the host machine have the bootloader binaries ready to flash
+to eMMC Boot0. Execute the :command:`dfu-util` to transfer
 files to the device. The general syntax for dfu-util command is:
 
 .. code-block:: console
@@ -356,11 +205,17 @@ Then transfer each desired binary from the host to the device:
    .. code-block:: console
 
       $ sudo dfu-util -R -a tiboot3.bin.raw -D tiboot3.bin
+      $ sudo dfu-util -R -a tispl.bin.raw -D tispl.bin
+      $ sudo dfu-util -R -a u-boot.img.raw -D u-boot.img
 
 - Device:
 
    .. code-block:: console
 
+      ##DOWNLOAD ... OK
+      Ctrl+C to exit ...
+      ##DOWNLOAD ... OK
+      Ctrl+C to exit ...
       ##DOWNLOAD ... OK
       Ctrl+C to exit ...
 
@@ -903,3 +758,60 @@ increasing order of reducing performance.
       };
 
       sdhci2: mmc@fa20000 {
+
+eMMC HS400 support in u-boot
+============================
+
+.. ifconfig:: CONFIG_part_family in ('AM62PX_family')
+
+   For 11.0 SDK, am62px device does not support eMMC HS400 mode due to errata i2458.
+   If support for HS400 is anyways required, please add the following DT attributes to sdhci0 node:
+
+   .. code-block:: diff
+
+      diff --git a/dts/upstream/src/arm64/ti/k3-am62p-j722s-common-main.dtsi b/dts/upstream/src/arm64/ti/k3-am62p-j722s-common-main.dtsi
+      index 8bfc6539b2a..8a536b081e1 100644
+      --- a/dts/upstream/src/arm64/ti/k3-am62p-j722s-common-main.dtsi
+      +++ b/dts/upstream/src/arm64/ti/k3-am62p-j722s-common-main.dtsi
+      @@ -593,12 +593,16 @@
+                      bus-width = <8>;
+                      mmc-ddr-1_8v;
+                      mmc-hs200-1_8v;
+      +               mmc-hs400-1_8v;
+                      ti,clkbuf-sel = <0x7>;
+      +               ti,strobe-sel = <0x55>;
+                      ti,trm-icp = <0x8>;
+                      ti,otap-del-sel-legacy = <0x1>;
+                      ti,otap-del-sel-mmc-hs = <0x1>;
+                      ti,otap-del-sel-ddr52 = <0x6>;
+                      ti,otap-del-sel-hs200 = <0x8>;
+      +               ti,otap-del-sel-hs400 = <0x5>; // at 0.85V VDD_CORE
+      +               //ti,otap-del-sel-hs400 = <0x7>; // at 0.75V VDD_CORE
+                      ti,itap-del-sel-legacy = <0x10>;
+                      ti,itap-del-sel-mmc-hs = <0xa>;
+                      ti,itap-del-sel-ddr52 = <0x3>;
+
+   and enable the following config options:
+
+   .. code-block:: diff
+
+      diff --git a/configs/am62px_evm_a53_defconfig b/configs/am62px_evm_a53_defconfig
+      index 09a91248ce6..f95879f41c9 100644
+      --- a/configs/am62px_evm_a53_defconfig
+      +++ b/configs/am62px_evm_a53_defconfig
+      @@ -114,8 +114,8 @@ CONFIG_MMC_IO_VOLTAGE=y
+       CONFIG_SPL_MMC_IO_VOLTAGE=y
+       CONFIG_MMC_UHS_SUPPORT=y
+       CONFIG_SPL_MMC_UHS_SUPPORT=y
+      -CONFIG_MMC_HS200_SUPPORT=y
+      -CONFIG_SPL_MMC_HS200_SUPPORT=y
+      +CONFIG_MMC_HS400_SUPPORT=y
+      +CONFIG_SPL_MMC_HS400_SUPPORT=y
+       CONFIG_MMC_SDHCI=y
+       CONFIG_MMC_SDHCI_ADMA=y
+       CONFIG_SPL_MMC_SDHCI_ADMA=y
+
+.. ifconfig:: CONFIG_part_family not in ('AM62PX_family')
+
+	eMMC HS400 is not suppported, refer to :ref:`this <mmc-sd-supported-hs-modes>` table for the list of modes supported in u-boot
+	for |__PART_FAMILY_NAME__| SoC.

@@ -152,14 +152,14 @@ The MACHINE can be set to |__SDK_BUILD_MACHINE__|, for example.
                   $ . conf/setenv
                   $ MACHINE=<machine> ARAGO_RT_ENABLE=1 bitbake -k tisdk-default-image
 
-      .. ifconfig:: CONFIG_part_variant in ('AM62X','AM62PX')
+      .. ifconfig:: CONFIG_part_variant in ('AM62X','AM62PX','AM62LX')
 
          * The final command below will build the :file:`tisdk-jailhouse-image`, which is the
            Processor SDK image with arago filesystem and Jailhouse support.
 
          .. ifconfig:: CONFIG_part_variant in ('AM62X')
 
-            * :file:`tisdk-jailhouse-image` is not applicable for am62xxsip-evm and beagleplay.
+            * :file:`tisdk-jailhouse-image` is not applicable for am62xxsip-evm and beagleplay-ti.
 
          .. tabs::
 
@@ -338,7 +338,7 @@ The "Build Output" is given relative to the
       | meta-toolchain-arago-tisdk   | sdk/arago-<arago-version>-<architecture>.sh                          | Devkit                     |
       +------------------------------+----------------------------------------------------------------------+----------------------------+
 
-   .. ifconfig:: CONFIG_part_variant in ('AM62X')
+   .. ifconfig:: CONFIG_part_variant in ('AM62X', 'AM62LX')
 
       +------------------------------+----------------------------------------------------------------+----------------------------+
       | Target                       | Build Output                                                   | Description                |
@@ -590,9 +590,7 @@ The "Build Output" is given relative to the
       +------------------+--------------------------------------------+
       | am62xx-lp-evm    | AM62x LP Starter Kit (SK) - HS-FS, HS-SE   |
       +------------------+--------------------------------------------+
-      | am62xxsip-evm    | AM62x-SIP Starter Kit (SK) - HS-FS, HS-SE  |
-      +------------------+--------------------------------------------+
-      | beagleplay       | BEAGL-PLAY-SBC - GP                        |
+      | beagleplay-ti    | BEAGL-PLAY-SBC - GP                        |
       +------------------+--------------------------------------------+
 
    .. ifconfig:: CONFIG_part_variant in ('AM62AX')
@@ -610,6 +608,14 @@ The "Build Output" is given relative to the
       +---------------+-----------------------------------------------------------------------------------------+
       | am65xx-evm    | AM65x Evaluation Module, AM65x Industrial Development Kit, DRA80xM Evaluation Module    |
       +---------------+-----------------------------------------------------------------------------------------+
+
+   .. ifconfig:: CONFIG_part_variant in ('AM62LX')
+
+      +---------------+-----------------------------------------------+
+      | **MACHINE**   | **Supported EVMs**                            |
+      +---------------+-----------------------------------------------+
+      | am62lxx-evm   | AM62L EVM - HS-FS                             |
+      +---------------+-----------------------------------------------+
 
    .. ifconfig:: CONFIG_part_variant in ('Gen')
 
@@ -685,9 +691,7 @@ The "Build Output" is given relative to the
       +------------------+--------------------------------------------+
       | am62xx-lp-evm    | AM62x LP Starter Kit (SK) - HS-FS, HS-SE   |
       +------------------+--------------------------------------------+
-      | am62xxsip-evm    | AM62x-SIP Starter Kit (SK) - HS-FS, HS-SE  |
-      +------------------+--------------------------------------------+
-      | beagleplay       | BEAGL-PLAY-SBC - GP                        |
+      | beagleplay-ti    | BEAGL-PLAY-SBC - GP                        |
       +------------------+--------------------------------------------+
 
    .. ifconfig:: CONFIG_part_variant in ('AM65X')
@@ -697,6 +701,14 @@ The "Build Output" is given relative to the
       +---------------+-----------------------------------------------------------------------------------------+
       | am65xx-evm    | AM65x Evaluation Module, AM65x Industrial Development Kit, DRA80xM Evaluation Module    |
       +---------------+-----------------------------------------------------------------------------------------+
+
+   .. ifconfig:: CONFIG_part_variant in ('AM62LX')
+
+      +---------------+-----------------------------------------------+
+      | **MACHINE**   | **Supported EVMs**                            |
+      +---------------+-----------------------------------------------+
+      | am62lxx-evm   | AM62L EVM - HS-FS                             |
+      +---------------+-----------------------------------------------+
 
    .. ifconfig:: CONFIG_part_variant in ('Gen')
 

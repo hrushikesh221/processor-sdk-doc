@@ -40,7 +40,7 @@ Fetch the code using ``repo``:
 .. code-block:: console
 
    $ mkdir ${YOUR_PATH}/ti-aosp-15 && cd $_
-   $ repo init -u https://git.ti.com/git/android/manifest.git -b android15-release -m releases/RLS_10_01.xml
+   $ repo init -u https://git.ti.com/git/android/manifest.git -b android15-release -m releases/RLS_10_01_01.xml
    $ repo sync
 
 .. tip::
@@ -77,33 +77,33 @@ Where ``<BUILD_TARGET>`` is listed in the table below :
     ============================= ============================
     Android Build type            Build target
     ============================= ============================
-    AM62X-SK Tablet userdebug       ``am62x-ap3a-userdebug``
-    AM62X-SK Tablet user            ``am62x-ap3a-user``
-    AM62X-SK Car userdebug          ``am62x_car-ap3a-userdebug``
-    AM62X-SK Car user               ``am62x_car-ap3a-user``
+    AM62X-SK Tablet userdebug       ``am62x-ap4a-userdebug``
+    AM62X-SK Tablet user            ``am62x-ap4a-user``
+    AM62X-SK Car userdebug          ``am62x_car-ap4a-userdebug``
+    AM62X-SK Car user               ``am62x_car-ap4a-user``
     ============================= ============================
 
-    The recommended ``<BUILD_TARGET>`` to use is ``am62x-ap3a-userdebug``.
+    The recommended ``<BUILD_TARGET>`` to use is ``am62x-ap4a-userdebug``.
 
 .. ifconfig:: CONFIG_part_variant in ('AM62PX')
 
     ============================= ============================
     Android Build type            Build target
     ============================= ============================
-    AM62PX-SK Tablet userdebug       ``am62p-ap3a-userdebug``
-    AM62PX-SK Tablet user            ``am62p-ap3a-user``
-    AM62PX-SK Car userdebug          ``am62p_car-ap3a-userdebug``
-    AM62PX-SK Car user               ``am62p_car-ap3a-user``
+    AM62PX-SK Tablet userdebug       ``am62p-ap4a-userdebug``
+    AM62PX-SK Tablet user            ``am62p-ap4a-user``
+    AM62PX-SK Car userdebug          ``am62p_car-ap4a-userdebug``
+    AM62PX-SK Car user               ``am62p_car-ap4a-user``
     ============================= ============================
 
-    The recommended ``<BUILD_TARGET>`` to use is ``am62p-ap3a-userdebug``.
+    The recommended ``<BUILD_TARGET>`` to use is ``am62p-ap4a-userdebug``.
 
 It's possible to customize the standard build (``m``), by passing build flags.
-For example, the following enables AVB on userdebug builds:
+For example, the following enables ADB on user builds:
 
 .. code-block:: console
 
-  $ TARGET_AVB_ENABLE=true m
+  $ TARGET_ADB_USER_ENABLE=true m
 
 The following build flags are available. **Default** values are **highlighted**.
 
@@ -113,9 +113,6 @@ The following build flags are available. **Default** values are **highlighted**.
    * - Flag
      - Possible values
      - Description
-   * - ``TARGET_AVB_ENABLE``
-     - **false**/true
-     - Forces AVB feature on userdebug
    * - ``TARGET_ADB_USER_ENABLE``
      - **false**/true
      - Forces enable ADB on user builds (**NOT for production builds**)

@@ -10,7 +10,7 @@ This page gives a basic description of DSS (Display SubSystem) hardware, the Lin
 Supported Devices
 =================
 
-There are many DSS IP versions, all of which support slightly different set of features. DSS versions up to 5 are supported by the omapdrm driver, and DSS versions 6 and up are supported by the tidss driver. This document covers DSS6, DSS7-L, and DSS7-UL which are used on the following TI SoCs or SoC families: K2G, AM65x, AM62x, AM62Ax, AM62Px, J721E, J721S2, J784S4.
+There are many DSS IP versions, all of which support slightly different set of features. DSS versions up to 5 are supported by the omapdrm driver, and DSS versions 6 and up are supported by the tidss driver. This document covers DSS6, DSS7-L, DSS7-UL and DSS7-Nano which are used on the following TI SoCs or SoC families: K2G, AM65x, AM62x, AM62Ax, AM62Px, AM62L, J721E, J721S2, J784S4.
 
 
 Hardware Architecture
@@ -45,6 +45,9 @@ The arrows show how pipelines are connected to overlay managers, which are furth
 
     - **Note:** While the DSS7-UL in AM62Ax has 2 video pipelines, there is only one video port (VP) coming out of the SoC. This VP outputs DPI signals. The other pipeline can be used to overlay video data on top of the first pipeline's output. On the AM62A-SK EVM, this DPI output is then forwarded to an on-board HDMI framer.
 
+.. ifconfig:: CONFIG_part_variant in ('AM62LX')
+
+    - **Note:** The DSS7 Nano in AM62LX has a single video pipeline and a single video port (VP) coming out of the SoC. The output of video port is routed to SoC boundary via DPI interface and the DPI signals from the video port are routed to DSI Tx controller present within the SoC. Same DPI signals are also forwarded to an on-board HDMI framer. At a time though, only a single interface i.e. DPI or DSI can be used with the EVM.
 
 Display Controller (DISPC)
 --------------------------
@@ -93,6 +96,14 @@ SoC Family: |__PART_FAMILY_DEVICE_NAMES__|
     | DSS version | Outputs       | Pipes             | Video ports |
     +=============+===============+===================+=============+
     | DSS7-UL     | DPI, OLDI     | VID, VIDL         | 2           |
+    +-------------+---------------+-------------------+-------------+
+
+.. ifconfig:: CONFIG_part_variant in ('AM62LX')
+
+    +-------------+---------------+-------------------+-------------+
+    | DSS version | Outputs       | Pipes             | Video ports |
+    +=============+===============+===================+=============+
+    | DSS7-Nano   | DPI, DSI      | VIDL              | 1           |
     +-------------+---------------+-------------------+-------------+
 
 
@@ -162,6 +173,10 @@ Supported Features
     - **Open LVDS Display Interface (OLDI)**
         -  Single Link OLDI
         -  Dual Link OLDI
+.. ifconfig:: CONFIG_part_variant in ('AM62LX')
+
+    - **MIPI DSI**
+        -  4 Lane MIPI DSI output
 .. ifconfig:: CONFIG_part_variant in ('AM62PX', 'J722S')
 
     - **Open LVDS Display Interface (OLDI)**
@@ -211,7 +226,7 @@ Supported Features
 Driver Architecture
 ===================
 
-The driver for DSS6 / DSS7-L / DSS7-UL IPs is tidss. tidss is a Direct Rendering Manager (DRM) driver, located in the directory drivers/gpu/drm/tidss/ in the kernel tree. tidss does not implement any 3D GPU features, only the Kernel Mode Setting (KMS) features, used to display pixel data on a display.
+The driver for DSS6 / DSS7-L / DSS7-UL / DSS7-Nano IPs is tidss. tidss is a Direct Rendering Manager (DRM) driver, located in the directory drivers/gpu/drm/tidss/ in the kernel tree. tidss does not implement any 3D GPU features, only the Kernel Mode Setting (KMS) features, used to display pixel data on a display.
 
 In addition to tidss, there are a number of bridge and panel drivers located in drivers/gpu/drm/bridge/ and drivers/gpu/drm/panel/ which provide support for various panels and bridges (both external and internal to SoC).
 
@@ -307,7 +322,7 @@ Unsupported Features/Limitations
     - MIPI DBI/RFBI
     - Interlace
 
-.. ifconfig:: CONFIG_part_variant in ('AM62X', 'AM65X', 'AM62AX', 'AM62PX', 'J722S')
+.. ifconfig:: CONFIG_part_variant in ('AM62X', 'AM65X', 'AM62AX', 'AM62PX', 'J722S', 'AM62LX')
 
         - **DisplayPort (MHDP)**
             - The SoC doesn't support the MHDP IP, and doesn't provide the DP output.
@@ -315,7 +330,7 @@ Unsupported Features/Limitations
 
         - **MIPI DSI**
             - The SoC doesn't support the DSI / DPHY-Tx, and doesn't provide the MIPI DSI output.
-.. ifconfig:: CONFIG_part_variant in ('AM62AX', 'J721E', 'J784S4','J742S2', 'J721S2')
+.. ifconfig:: CONFIG_part_variant in ('AM62AX', 'J721E', 'J784S4','J742S2', 'J721S2', 'AM62LX')
 
         - **Open LVDS Display Interface (OLDI)**
             - The SoC doesn't support the OLDI TXes, and doesn't provide the OLDI output.
@@ -585,85 +600,86 @@ the associated objects are as follows.
 Since HDMI display is disconnected at the moment, no CRTC object has been enumerated for it, and
 hence plane 41 remains unused.
 
+.. ifconfig:: CONFIG_part_variant not in ('AM62LX')
 
-- **Z order**
+ - **Z order**
 
-Z position of the plane when multiple planes are being displayed.
+   Z position of the plane when multiple planes are being displayed.
 
-This property is enumerated as ``zpos`` in the modetest output. This property can be used with the
-``-w`` option of modetest. However, this property is not useful without plane overlaying, as it
-won't show use any discernible change on the display. Hence, refer the example given in the next
-section.
+   This property is enumerated as ``zpos`` in the modetest output. This property can be used with the
+   ``-w`` option of modetest. However, this property is not useful without plane overlaying, as it
+   won't show use any discernible change on the display. Hence, refer the example given in the next
+   section.
 
-- **Plane Overlaying**
+ - **Plane Overlaying**
 
-Use unused planes as overlay planes.
+   Use unused planes as overlay planes.
 
-Based on the version, the DSS controller can have 2 to 4 video pipelines, which get
-enumerated as DRM planes. If the number of displays connected is less than the
-number of video pipes in the DSS controller, the extra pipes can be used as overlay planes.
+   Based on the version, the DSS controller can have 2 to 4 video pipelines, which get
+   enumerated as DRM planes. If the number of displays connected is less than the
+   number of video pipes in the DSS controller, the extra pipes can be used as overlay planes.
 
-In this example, plane 41 remains an unused plane, while plane 31 acts as a primary plane
-for CRTC 38. To use plane 41 as an overlay on top of plane 31, the following command can be
-used.
+   In this example, plane 41 remains an unused plane, while plane 31 acts as a primary plane
+   for CRTC 38. To use plane 41 as an overlay on top of plane 31, the following command can be
+   used.
 
-.. code-block:: console
+  .. code-block:: console
 
         $ modetest -M tidss -s 40@38:1920x1200 -P 41@38:1280x720 -w 41:zpos:1
         setting mode 1920x1200-60.00Hz on connectors 40, crtc 38
         testing 1280x720@XR24 overlay plane 41
 
-In this example, we use the primary plane via its connector and crtc using the ``-s`` option.
-``-s 40@38:1920x1200`` renders vertical color bars on the LVDS display. Adding the ``-P`` option,
-``-P 41@38:1280x720``, renders another frame of color bars (diagonal in this case) of resolution
-1280x720. The ``-w 41:zpos:1`` ensures that the plane 41 is displayed on top of plane 31 (or else,
-if plane 31 is on top, then plane 41 will be underneath and hence won't show up on the display).
+  In this example, we use the primary plane via its connector and crtc using the ``-s`` option.
+  ``-s 40@38:1920x1200`` renders vertical color bars on the LVDS display. Adding the ``-P`` option,
+  ``-P 41@38:1280x720``, renders another frame of color bars (diagonal in this case) of resolution
+  1280x720. The ``-w 41:zpos:1`` ensures that the plane 41 is displayed on top of plane 31 (or else,
+  if plane 31 is on top, then plane 41 will be underneath and hence won't show up on the display).
 
-- **Global Alpha Blending**
+ - **Global Alpha Blending**
 
-Full plane alpha-blending
+  Full plane alpha-blending
 
-When displaying multiple planes on top of one another, we can assign transparency levels to each of
-the planes using the ``alpha`` property. For tidss, the value of this property ranges from 0 with
-complete transparency to 65535 with complete opacity.
+  When displaying multiple planes on top of one another, we can assign transparency levels to each of
+  the planes using the ``alpha`` property. For tidss, the value of this property ranges from 0 with
+  complete transparency to 65535 with complete opacity.
 
-.. code-block:: console
+  .. code-block:: console
 
-        $ modetest -M tidss -s 40@38:1920x1200 -P 41@38:1280x720 -w 41:zpos:0 -w 31:zpos:1 -w 31:alpha:10000
-        setting mode 1920x1200-60.00Hz on connectors 40, crtc 38
-        testing 1280x720@XR24 overlay plane 41
+          $ modetest -M tidss -s 40@38:1920x1200 -P 41@38:1280x720 -w 41:zpos:0 -w 31:zpos:1 -w 31:alpha:10000
+          setting mode 1920x1200-60.00Hz on connectors 40, crtc 38
+          testing 1280x720@XR24 overlay plane 41
 
-In this example, we are displaying the overlay plane (41) behind the primary plane (31) by
-manipulating the ``zpos`` property. Since the overlay plane is of a smaller resolution (1280x720)
-and the primary plane is of resolution 1920x1200, the overlay plane is expected to not be seen.
-However, with the introduction of the alpha property on the primary plane that doesn't happen. With
-``alpha`` = 10000 (out of 65535), faint vertical color bars can be seen on the display, along with
-diagonal color bars as solid.
+  In this example, we are displaying the overlay plane (41) behind the primary plane (31) by
+  manipulating the ``zpos`` property. Since the overlay plane is of a smaller resolution (1280x720)
+  and the primary plane is of resolution 1920x1200, the overlay plane is expected to not be seen.
+  However, with the introduction of the alpha property on the primary plane that doesn't happen. With
+  ``alpha`` = 10000 (out of 65535), faint vertical color bars can be seen on the display, along with
+  diagonal color bars as solid.
 
-- **Scaling**
+ - **Scaling**
 
-Scale the frame smaller or larger.
+  Scale the frame smaller or larger.
 
-This feature will only work for plane IDs that map to the VID pipeline of tidss (and not the VIDL
-pipe). Follow this simple rule of thumb to find out if a particular DRM plane is VID or not. DSS-7
-has 4 pipelines in total, while DSS7-UL has 2 pipelines. The VIDL pipelines get enumerated as DRM
-planes first, and then the VID pipes do. Therefore
+  This feature will only work for plane IDs that map to the VID pipeline of tidss (and not the VIDL
+  pipe). Follow this simple rule of thumb to find out if a particular DRM plane is VID or not. DSS-7
+  has 4 pipelines in total, while DSS7-UL has 2 pipelines. The VIDL pipelines get enumerated as DRM
+  planes first, and then the VID pipes do. Therefore
 
-        - For DSS7-L with 4 pipelines and DRM plane IDs 31, 41, 51, and 58, the DRM planes 51 and 58
-          are VID pipelines and thus have scaling support.
+          - For DSS7-L with 4 pipelines and DRM plane IDs 31, 41, 51, and 58, the DRM planes 51 and 58
+            are VID pipelines and thus have scaling support.
 
-        - For DSS7-UL with 2 pipelines and DRM plane IDs 31, and 41, the DRM plane 41 is the VID
-          pipeline and thus have scaling support.
+          - For DSS7-UL with 2 pipelines and DRM plane IDs 31, and 41, the DRM plane 41 is the VID
+            pipeline and thus have scaling support.
 
-The following example was run on DSS7-UL and hence the pipe with scaling capability is DRM plane 41.
+  The following example was run on DSS7-UL and hence the pipe with scaling capability is DRM plane 41.
 
-.. code-block:: console
+  .. code-block:: console
 
-        $ modetest -M tidss -s 40@38:1920x1200@AR24 -P 41@38:400x400*2
-        setting mode 1920x1200-60.00Hz on connectors 40, crtc 38
-        testing 400x400@XR24 overlay plane 41
+          $ modetest -M tidss -s 40@38:1920x1200@AR24 -P 41@38:400x400*2
+          setting mode 1920x1200-60.00Hz on connectors 40, crtc 38
+          testing 400x400@XR24 overlay plane 41
 
-Note that the ``*2`` at the end of ``-P 41@38:400x400*2`` is the scaling factor.
+  Note that the ``*2`` at the end of ``-P 41@38:400x400*2`` is the scaling factor.
 
 - **Cropping**
 
@@ -700,17 +716,55 @@ Taking as an input a video frame of dimensions ``1000x1000``,the example creates
 
 .. code-block:: console
 
-   $ kmstest -c hdmi -p 0:500,200-800x800 -f 1000x1000 -v 200,100-800x800                                                                                                                     
+   $ kmstest -c hdmi -p 0:500,200-800x800 -f 1000x1000 -v 200,100-800x800
    Connector 1/@50: HDMI-A-1
    Crtc 1/@48: 1920x1080@59.93 138.500 1920/48/32/80/+ 1080/3/5/23/- 60 (59.93) 0x9 0x48
    Plane 0/@31: 500,200-800x800
    Fb 54 1000x1000-XR24
 
-Taking as an input a video frame of dimensions ``1000x1000``, this example creates a cropped source rectangle of dimensions ``800x800``, starting at coordinates ``500,200`` and displays it on screen at coordinates ``200,100`` keeping the same dimensions as source rectangle i.e ``800x800`` without scaling. 
+Taking as an input a video frame of dimensions ``1000x1000``, this example creates a cropped source rectangle of dimensions ``800x800``, starting at coordinates ``500,200`` and displays it on screen at coordinates ``200,100`` keeping the same dimensions as source rectangle i.e ``800x800`` without scaling.
 
 .. figure:: /images/DSS_cropping_example_3.jpg
    :height: 600
    :width: 1020
+
+- **Gamma Correction**
+
+Gamma correction or gamma is used to adjust the brightness and color of images on a display. It is applied to ensure that the image appears as intended, with accurate brightness and color representation. Displays, such as LCDs and OLEDs, do not respond linearly to input signals. This means that the display's brightness does not increase linearly with the input voltage. Gamma correction compensates for this non-linear response by applying a non-linear transformation to the input signal. Gamma correction is typically applied using a look-up table (LUT) or a mathematical formula. The LUT or formula maps the input pixel values to output values that have been adjusted to compensate for the display’s non-linear response. DSS7 uses a look-up table for gamma correction. The gamma correction curve is usually represented by a power-law function, where the output value is proportional to the input value raised to a power.
+
+.. math::
+
+   V_{out} = AV_{in}^\gamma
+
+To show the effects of Gamma Correction, we have used a script(`<https://github.com/tomba/kmsxx/blob/master/py/tests/gamma.py>`__) that can be used directly from user-space. The script creates and sets the gamma look-up table using gamma value as 2.2. To use the script, first weston/display-manager should be stopped, see :ref:`stopping-weston`.
+
+Now, save the script and run it.
+
+.. code-block:: console
+
+   $ python3 gamma.py
+      press enter to apply gamma
+
+      press enter to remove gamma
+
+      press enter to exit
+
+Below is the test pattern image with gamma correction applied
+
+.. figure:: /images/DSS_example_with_gamma.jpg
+   :height: 670
+   :width: 1020
+
+Below is the test pattern image without gamma correction
+
+.. figure:: /images/DSS_example_without_gamma.jpg
+   :height: 670
+   :width: 1020
+
+For further information on gamma correction:
+
+*  `<https://www.w3.org/TR/PNG-GammaAppendix.html>`__
+*  `<https://www.benq.com/en-us/knowledge-center/knowledge/gamma-monitor.html>`__
 
 Buffers
 -------

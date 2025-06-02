@@ -17,7 +17,7 @@ to boot into U-Boot and use fastboot.
 .. warning::
 
    Make sure to use the same bootloaders as the release you are flashing.
-   The latest release is ``10.01.00``.
+   The latest release is ``10.01.01``.
 
 Identify the SD Card
 ====================
@@ -46,7 +46,7 @@ Then, run:
    (OR)
 
    # If you are using pre-built binaries from SDK download page
-   $ cd AM62Px_10.01.00_emmc
+   $ cd AM62Px_10.01.01_emmc
 
    $ sudo ./flashall.sh --board am62px-sk --bootloader --sdcard /dev/mmcblk0
 
@@ -70,8 +70,8 @@ the images are built from source.
      :header-rows: 1
 
      * - Switch Label
-       - SW2: 12345678
-       - SW3: 12345678
+       - SW5: 12345678
+       - SW4: 12345678
 
      * - SD
        - 01000000

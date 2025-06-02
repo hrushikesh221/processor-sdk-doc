@@ -1,3 +1,10 @@
+# python artifacts
 *.swp
 *.pyc
+
+# build artifacts
 build/
+
+# vale configs and intermediary data
+.github/styles/*
+!.github/styles/config

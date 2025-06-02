@@ -30,7 +30,7 @@ Prerequisites
    Please be sure that you have the same version number
    for both Processor SDK RTOS and Linux.
 
-`Please refer to the MCU+SDK IPC documentation for R5F and M4F IPC architecture and builds: <https://software-dl.ti.com/mcu-plus-sdk/esd/AM64X/10_01_00_32/exports/docs/api_guide_am64x/IPC_GUIDE.html>`__
+`Please refer to the MCU+SDK IPC documentation for R5F and M4F IPC architecture and builds: <https://software-dl.ti.com/mcu-plus-sdk/esd/AM64X/latest/exports/docs/api_guide_am64x/IPC_GUIDE.html>`__
 
 Typical Boot Flow on AM64x for ARM Linux users
 ----------------------------------------------
@@ -378,31 +378,30 @@ rpmsg_char_close()
 `All remote proc ids are defined in rproc_id.h <https://git.ti.com/cgit/rpmsg/ti-rpmsg-char/tree/include/rproc_id.h>`__
 
 The below table lists the device enumerations as defined in the rpmsg_char_library. The validiaty of the enumerations wrt AM64x is also specified.
-::
 
-	+------------------+--------------------+---------+-----------------------------------+
-	| Enumeration ID   | Device Name        | Valid   | Description                       |
-	+==================+====================+=========+===================================+
-	| R5F_MCU0_0       |N/A                 | No      | R5F SS in MCU domain              |
-	+------------------+--------------------+---------+-----------------------------------+
-	| R5F_MCU0_1       |N/A                 | No      | R5F SS in MCU domain              |
-	+------------------+--------------------+---------+-----------------------------------+
-	| R5F_MAIN0_0      | 78000000.r5f       | Yes     | R5F Cluster0 Core0 in Main Domain |
-	+------------------+--------------------+---------+-----------------------------------+
-	| R5F_MAIN0_1      | 78200000.r5f       | Yes     | R5F Cluster0 Core1 in Main Domain |
-	+------------------+--------------------+---------+-----------------------------------+
-	| R5F_MAIN1_0      | 78400000.r5f       | Yes     | R5F Cluster1 Core0 in Main Domain |
-	+------------------+--------------------+---------+-----------------------------------+
-	| R5F_MAIN1_1      | 78600000.r5f       | Yes     | R5F Cluster1 Core1 in Main Domain |
-	+------------------+--------------------+---------+-----------------------------------+
-	| DSP_C66_0        |N/A                 | No      | C66 DSP                           |
-	+------------------+--------------------+---------+-----------------------------------+
-	| DSP_C66_1        |N/A                 | No      | C66 DSP                           |
-	+------------------+--------------------+---------+-----------------------------------+
-	| DSP_C71_0        |N/A                 | No      | C71 DSP                           |
-	+------------------+--------------------+---------+-----------------------------------+
-	| M4F_MCU0_0       | 5000000.m4f        | Yes     | M4F core in MCU Domain            |
-	+------------------+--------------------+---------+-----------------------------------+
++------------------+--------------------+---------+-----------------------------------+
+| Enumeration ID   | Device Name        | Valid   | Description                       |
++==================+====================+=========+===================================+
+| R5F_MCU0_0       | N/A                | No      | R5F SS in MCU domain              |
++------------------+--------------------+---------+-----------------------------------+
+| R5F_MCU0_1       | N/A                | No      | R5F SS in MCU domain              |
++------------------+--------------------+---------+-----------------------------------+
+| R5F_MAIN0_0      | 78000000.r5f       | Yes     | R5F Cluster0 Core0 in Main Domain |
++------------------+--------------------+---------+-----------------------------------+
+| R5F_MAIN0_1      | 78200000.r5f       | Yes     | R5F Cluster0 Core1 in Main Domain |
++------------------+--------------------+---------+-----------------------------------+
+| R5F_MAIN1_0      | 78400000.r5f       | Yes     | R5F Cluster1 Core0 in Main Domain |
++------------------+--------------------+---------+-----------------------------------+
+| R5F_MAIN1_1      | 78600000.r5f       | Yes     | R5F Cluster1 Core1 in Main Domain |
++------------------+--------------------+---------+-----------------------------------+
+| DSP_C66_0        | N/A                | No      | C66 DSP                           |
++------------------+--------------------+---------+-----------------------------------+
+| DSP_C66_1        | N/A                | No      | C66 DSP                           |
++------------------+--------------------+---------+-----------------------------------+
+| DSP_C71_0        | N/A                | No      | C71 DSP                           |
++------------------+--------------------+---------+-----------------------------------+
+| M4F_MCU0_0       | 5000000.m4f        | Yes     | M4F core in MCU Domain            |
++------------------+--------------------+---------+-----------------------------------+
 
 .. note::
 
