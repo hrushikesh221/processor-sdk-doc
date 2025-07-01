@@ -12,6 +12,7 @@ User's Guide
     UG-DFU
     UG-Network
     UG-Network-K3
+    UG-PCIeBoot
     UG-NAND
     UG-Memory-K3
     UG-Memory-OMAP
